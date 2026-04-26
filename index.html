@@ -832,21 +832,31 @@ window._msConfig = { publicKey: "pk_21f83fed299ef36d943d" };
   }, { threshold: 0.1 });
   reveals.forEach(el => observer.observe(el));
 
-  // Wire signup/login buttons once Memberstack loads
-  window.addEventListener('memberstack:ready', function() {
-    document.getElementById('nav-signup-btn').addEventListener('click', () => {
+  // Memberstack integration
+  function waitForMemberstack(cb, tries=0) {
+    if (window.$memberstackDom) { cb(); return; }
+    if (tries > 40) return; // give up after 4 seconds
+    setTimeout(() => waitForMemberstack(cb, tries+1), 100);
+  }
+
+  function openSignup() {
+    waitForMemberstack(() => {
       window.$memberstackDom.openModal('SIGNUP', { planId: 'pln_free-trial-n66c0e43' });
     });
-    document.getElementById('hero-signup-btn').addEventListener('click', () => {
-      window.$memberstackDom.openModal('SIGNUP', { planId: 'pln_free-trial-n66c0e43' });
-    });
-    document.getElementById('pricing-signup-btn').addEventListener('click', () => {
-      window.$memberstackDom.openModal('SIGNUP', { planId: 'pln_free-trial-n66c0e43' });
-    });
-    document.getElementById('nav-login-btn').addEventListener('click', () => {
+  }
+  function openLogin() {
+    waitForMemberstack(() => {
       window.$memberstackDom.openModal('LOGIN');
     });
-    // Auto-redirect if already logged in
+  }
+
+  document.getElementById('nav-signup-btn').addEventListener('click', openSignup);
+  document.getElementById('hero-signup-btn').addEventListener('click', openSignup);
+  document.getElementById('pricing-signup-btn').addEventListener('click', openSignup);
+  document.getElementById('nav-login-btn').addEventListener('click', openLogin);
+
+  // Auto-redirect if already logged in
+  waitForMemberstack(() => {
     window.$memberstackDom.getCurrentMember().then(({ data: member }) => {
       if (member) window.location.href = 'app.html';
     });
