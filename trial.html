@@ -197,6 +197,26 @@
   .tippy.show{opacity:1;}
   .tippy kbd{background:rgba(232,184,75,0.15);border:1px solid rgba(232,184,75,0.3);border-radius:3px;padding:1px 5px;font-size:11px;color:#e8b84b;font-family:monospace;margin-left:5px;}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@memberstack/dom@1/dist/memberstack-dom.umd.min.js"></script>
+<script>
+  const memberstack = MemberstackDOMPackage.init({ publicKey: "pk_21f83fed299ef36d943d" });
+  // Protect this page — must be logged in with any plan
+  memberstack.getCurrentMember().then(({ data: member }) => {
+    if (!member) {
+      window.location.href = '/';
+      return;
+    }
+    // If they have a paid subscription, upgrade them to the full app
+    const plans = member.planConnections || [];
+    const hasSub = plans.some(p =>
+      p.planId === 'pln_subscriber-jk6d0eo5' && p.status === 'ACTIVE'
+    );
+    if (hasSub) {
+      window.location.href = 'app.html';
+    }
+    // Otherwise they stay here on the trial version
+  });
+</script>
 </head>
 <body>
 <input type="file" id="file-single" accept="video/*">
