@@ -258,6 +258,7 @@
     <div id="player-wrap">
       <video id="video" preload="metadata" muted></video>
       <canvas id="canvas"></canvas>
+      <canvas id="wm-canvas" style="position:absolute;top:0;left:0;pointer-events:none;z-index:12;"></canvas>
       <div id="webcam-bubble">
         <video id="webcam-video" autoplay muted playsinline></video>
       </div>
@@ -337,6 +338,43 @@ const state={tool:'pen',color:'#f5e642',size:8,drawing:false,startX:0,startY:0,s
   zoom:1,panX:0,panY:0
 };
 const video=document.getElementById('video'),canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d'),dropZone=document.getElementById('drop-zone'),playerWrap=document.getElementById('player-wrap'),progressEl=document.getElementById('progress'),timeDisplay=document.getElementById('time-display'),speedDisplay=document.getElementById('speed-display'),playlistPanel=document.getElementById('playlist-panel'),playlistList=document.getElementById('playlist-list'),playlistCount=document.getElementById('playlist-count'),playlistEmpty=document.getElementById('playlist-empty'),bookmarkPanel=document.getElementById('bookmark-panel'),bookmarkList=document.getElementById('bookmark-list'),bmEmpty=document.getElementById('bm-empty'),bmNoteInput=document.getElementById('bm-note-input'),filenameDisplay=document.getElementById('filename-display'),toast=document.getElementById('toast'),colorSwatch=document.getElementById('color-swatch'),colorInput=document.getElementById('color-input'),sizeSlider=document.getElementById('size-slider'),sizeVal=document.getElementById('size-val');
+
+// ── WATERMARK ──
+const wmCanvas=document.getElementById('wm-canvas');
+const wmCtx=wmCanvas.getContext('2d');
+
+function drawWatermark(){
+  const pr=playerWrap.getBoundingClientRect();
+  if(!pr.width||!pr.height)return;
+  wmCanvas.style.left='0';wmCanvas.style.top='0';
+  wmCanvas.style.width=pr.width+'px';wmCanvas.style.height=pr.height+'px';
+  wmCanvas.width=pr.width;wmCanvas.height=pr.height;
+  const w=pr.width,h=pr.height;
+  wmCtx.clearRect(0,0,w,h);
+  wmCtx.save();
+  wmCtx.rotate(-Math.PI/4);
+  const fontSize=Math.max(22,Math.round(w*0.038));
+  wmCtx.font=`900 ${fontSize}px 'Barlow Condensed', Arial`;
+  wmCtx.fillStyle='rgba(255,255,255,0.28)';
+  wmCtx.strokeStyle='rgba(0,0,0,0.18)';
+  wmCtx.lineWidth=3;
+  wmCtx.letterSpacing='0.12em';
+  const text='MYFILMROOM.COM — FREE TRIAL';
+  const tw=wmCtx.measureText(text).width+60;
+  const diag=Math.sqrt(w*w+h*h);
+  for(let x=-diag;x<diag*2;x+=tw){
+    for(let y=-diag;y<diag*2;y+=fontSize*3.5){
+      wmCtx.strokeText(text,x,y);
+      wmCtx.fillText(text,x,y);
+    }
+  }
+  wmCtx.restore();
+}
+
+// Draw watermark after video loads and on resize
+video.addEventListener('loadedmetadata',()=>{setTimeout(drawWatermark,100);});
+window.addEventListener('resize',drawWatermark);
+setTimeout(drawWatermark,300);
 
 function resizeCanvas(){
   const r=video.getBoundingClientRect();if(!r.width||!r.height)return;
@@ -1181,6 +1219,14 @@ document.getElementById('btn-export').addEventListener('click',()=>{
   } else {
     oc.drawImage(video,0,0,vw,vh);
     if(canvas.width&&canvas.height) oc.drawImage(canvas,0,0,vw,vh);
+  // Bake watermark into export
+  const wmOff=document.createElement('canvas');wmOff.width=vw;wmOff.height=vh;
+  const woc=wmOff.getContext('2d');woc.save();woc.rotate(-Math.PI/4);
+  const fs=Math.max(22,Math.round(vw*0.038));
+  woc.font=`900 ${fs}px Arial`;woc.fillStyle='rgba(255,255,255,0.28)';woc.strokeStyle='rgba(0,0,0,0.18)';woc.lineWidth=3;
+  const wt='MYFILMROOM.COM — FREE TRIAL',tw2=woc.measureText(wt).width+60,diag2=Math.sqrt(vw*vw+vh*vh);
+  for(let x=-diag2;x<diag2*2;x+=tw2)for(let y=-diag2;y<diag2*2;y+=fs*3.5){woc.strokeText(wt,x,y);woc.fillText(wt,x,y);}
+  woc.restore();oc.drawImage(wmOff,0,0,vw,vh);
   }
   const link=document.createElement('a');
   link.download=`filmroom-${filenameDisplay.textContent.replace(/\.[^.]+$/,'').substring(0,30)}-${fmt(video.currentTime).replace(':','m')}s.png`;
