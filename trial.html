@@ -229,7 +229,14 @@
         e.stopPropagation();menuOpen=!menuOpen;
         acctMenu.style.display=menuOpen?'block':'none';
       });
-      document.getElementById('acct-upgrade').addEventListener('click',(e)=>{e.stopPropagation();acctMenu.style.display='none';menuOpen=false;window.$memberstackDom.openModal('CHECKOUT',{priceId:'prc_monthly-my1o03py'});});
+      document.getElementById('acct-upgrade').addEventListener('click',(e)=>{
+        e.stopPropagation();acctMenu.style.display='none';menuOpen=false;
+        window.$memberstackDom.purchasePlansWithCheckout({
+          priceId:'prc_monthly-my1o03py',
+          successUrl:'https://myfilmroom.com/app.html',
+          cancelUrl:'https://myfilmroom.com/trial.html'
+        });
+      });
       document.getElementById('acct-profile').addEventListener('click',(e)=>{e.stopPropagation();acctMenu.style.display='none';menuOpen=false;window.$memberstackDom.openModal('PROFILE');});
       document.getElementById('acct-logout').addEventListener('click',(e)=>{e.stopPropagation();window.$memberstackDom.logout().then(()=>window.location.href='/');});
       document.addEventListener('click',()=>{acctMenu.style.display='none';menuOpen=false;});
