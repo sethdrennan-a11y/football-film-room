@@ -846,13 +846,13 @@
   function openSignup() {
     waitForMemberstack(() => {
       window.$memberstackDom.openModal('SIGNUP', { planId: 'pln_free-trial-n66c0e43' })
-        .then(({ data }) => { if (data?.member) redirectMember(data.member); });
+        .then(() => window.location.reload());
     });
   }
   function openLogin() {
     waitForMemberstack(() => {
       window.$memberstackDom.openModal('LOGIN')
-        .then(({ data }) => { if (data?.member) redirectMember(data.member); });
+        .then(() => window.location.reload());
     });
   }
 
