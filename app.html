@@ -197,25 +197,15 @@
   .tippy.show{opacity:1;}
   .tippy kbd{background:rgba(232,184,75,0.15);border:1px solid rgba(232,184,75,0.3);border-radius:3px;padding:1px 5px;font-size:11px;color:#e8b84b;font-family:monospace;margin-left:5px;}
 </style>
-<script src="https://cdn.jsdelivr.net/npm/@memberstack/dom@1/dist/memberstack-dom.umd.min.js"></script>
+<script async src="https://static.memberstack.com/scripts/v1/memberstack.js" data-memberstack-app="app_cmog066pl001u0suadgpg795a"></script>
 <script>
-  const memberstack = MemberstackDOMPackage.init({ publicKey: "pk_21f83fed299ef36d943d" });
-  // Protect this page — must be a logged-in subscriber
-  memberstack.getCurrentMember().then(({ data: member }) => {
-    if (!member) {
-      // Not logged in — send to homepage
-      window.location.href = '/';
-      return;
-    }
-    // Check they have the subscriber plan
-    const plans = member.planConnections || [];
-    const hasSub = plans.some(p =>
-      p.planId === 'pln_subscriber-jk6d0eo5' && p.status === 'ACTIVE'
-    );
-    if (!hasSub) {
-      // Has account but not subscriber — send to trial
-      window.location.href = 'trial.html';
-    }
+  window.addEventListener('memberstack:ready', function() {
+    window.$memberstackDom.getCurrentMember().then(({ data: member }) => {
+      if (!member) { window.location.href = '/'; return; }
+      const plans = member.planConnections || [];
+      const hasSub = plans.some(p => p.planId === 'pln_subscriber-jk6d0eo5' && p.status === 'ACTIVE');
+      if (!hasSub) window.location.href = 'trial.html';
+    });
   });
 </script>
 </head>
