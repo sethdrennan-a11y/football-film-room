@@ -831,18 +831,28 @@
   // Memberstack integration
   function waitForMemberstack(cb, tries=0) {
     if (window.$memberstackDom) { cb(); return; }
-    if (tries > 40) return; // give up after 4 seconds
+    if (tries > 40) return;
     setTimeout(() => waitForMemberstack(cb, tries+1), 100);
+  }
+
+  function redirectMember(member) {
+    if (!member) return;
+    const hasSub = (member.planConnections||[]).some(p =>
+      p.planId === 'pln_subscriber-jk6d0eo5' && p.status === 'ACTIVE'
+    );
+    window.location.href = hasSub ? '/app.html' : '/trial.html';
   }
 
   function openSignup() {
     waitForMemberstack(() => {
-      window.$memberstackDom.openModal('SIGNUP', { planId: 'pln_free-trial-n66c0e43' });
+      window.$memberstackDom.openModal('SIGNUP', { planId: 'pln_free-trial-n66c0e43' })
+        .then(({ data }) => { if (data?.member) redirectMember(data.member); });
     });
   }
   function openLogin() {
     waitForMemberstack(() => {
-      window.$memberstackDom.openModal('LOGIN');
+      window.$memberstackDom.openModal('LOGIN')
+        .then(({ data }) => { if (data?.member) redirectMember(data.member); });
     });
   }
 
@@ -854,7 +864,7 @@
   // Auto-redirect if already logged in
   waitForMemberstack(() => {
     window.$memberstackDom.getCurrentMember().then(({ data: member }) => {
-      if (member) window.location.href = 'app.html';
+      if (member) redirectMember(member);
     });
   });
 </script>
