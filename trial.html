@@ -231,11 +231,7 @@
       });
       document.getElementById('acct-upgrade').addEventListener('click',(e)=>{
         e.stopPropagation();acctMenu.style.display='none';menuOpen=false;
-        window.$memberstackDom.purchasePlansWithCheckout({
-          priceId:'prc_monthly-my1o03py',
-          successUrl:'https://myfilmroom.com/app.html',
-          cancelUrl:'https://myfilmroom.com/trial.html'
-        });
+        window.open('https://buy.stripe.com/aFa3cu744fQ6eJH2mJ7bW00','_blank');
       });
       document.getElementById('acct-profile').addEventListener('click',(e)=>{e.stopPropagation();acctMenu.style.display='none';menuOpen=false;window.$memberstackDom.openModal('PROFILE');});
       document.getElementById('acct-logout').addEventListener('click',(e)=>{e.stopPropagation();window.$memberstackDom.logout().then(()=>window.location.href='/');});
