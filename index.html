@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Film Room — Break Down the Game</title>
+<script src="https://cdn.jsdelivr.net/npm/@memberstack/dom@1/dist/memberstack-dom.umd.min.js"></script>
+<script>
+  const memberstack = MemberstackDOMPackage.init({ publicKey: "pk_21f83fed299ef36d943d" });
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
@@ -610,7 +614,8 @@
 
 <nav>
   <div class="nav-logo">Film <span>Room</span></div>
-  <a href="trial.html" class="nav-cta">Try It Free</a>
+  <button class="nav-cta" id="nav-signup-btn">Try It Free</button>
+  <button class="nav-cta" id="nav-login-btn" style="background:none;color:var(--muted);border:1px solid rgba(255,255,255,0.15);margin-left:8px;">Log In</button>
 </nav>
 
 <!-- HERO -->
@@ -619,7 +624,7 @@
   <h1>Break Down<br><em>Every Play.</em></h1>
   <p class="hero-sub">Draw routes, circle players, scrub frame-by-frame, and record your entire breakdown session — all in one lightweight tool built for content creators and sports analysts. No installs, no bloat, no learning curve.</p>
   <div class="hero-actions">
-    <a href="trial.html" class="btn-primary">Try It Free</a>
+    <button class="btn-primary" id="hero-signup-btn">Try It Free — 7 Days</button>
     <a href="#preview" class="btn-ghost">See how it works ↓</a>
   </div>
 
@@ -802,7 +807,7 @@
       <li>Works 100% offline</li>
       <li>All future updates included</li>
     </ul>
-    <a href="trial.html" class="btn-subscribe">Try It Free</a>
+    <button class="btn-subscribe" id="pricing-signup-btn">Start Free Trial</button>
     <p class="price-fine">7-day free trial · No credit card required to start</p>
   </div>
 </section>
@@ -825,6 +830,35 @@
     });
   }, { threshold: 0.1 });
   reveals.forEach(el => observer.observe(el));
+
+  // Memberstack — Free Trial signup (no card required)
+  const FREE_TRIAL_PLAN = 'pln_free-trial-n66c0e43';
+  const SUBSCRIBER_PLAN = 'pln_subscriber-jk6d0eo5';
+
+  async function openSignup() {
+    try {
+      const result = await memberstack.openModal('SIGNUP', {
+        planId: FREE_TRIAL_PLAN
+      });
+      if (result) window.location.href = 'trial.html';
+    } catch(e) {}
+  }
+
+  async function openLogin() {
+    try {
+      await memberstack.openModal('LOGIN');
+    } catch(e) {}
+  }
+
+  document.getElementById('nav-signup-btn').addEventListener('click', openSignup);
+  document.getElementById('hero-signup-btn').addEventListener('click', openSignup);
+  document.getElementById('pricing-signup-btn').addEventListener('click', openSignup);
+  document.getElementById('nav-login-btn').addEventListener('click', openLogin);
+
+  // If already logged in, redirect to app
+  memberstack.getCurrentMember().then(({ data: member }) => {
+    if (member) window.location.href = 'app.html';
+  });
 </script>
 </body>
 </html>
