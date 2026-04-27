@@ -902,7 +902,7 @@ function updateShortcutHint(){
   const h=document.getElementById('shortcut-hint');
   if(!h)return;
   const kl=id=>keyLabel(keys[id]);
-  h.innerHTML=`<kbd>${kl('rev4x')}</kbd>4xrev <kbd>${kl('rev2x')}</kbd>2xrev <kbd>${kl('revHalf')}</kbd>½rev <kbd>${kl('fwdHalf')}</kbd>½fwd <kbd>${kl('fwd2x')}</kbd>2xfwd <kbd>${kl('pen')}</kbd>pen <kbd>${kl('circle')}</kbd>circle <kbd>${kl('triangle')}</kbd>tri <kbd>${kl('undo')}</kbd>undo <kbd>${kl('clear')}</kbd>clear <kbd>${kl('fade')}</kbd>fade <kbd>${kl('clipIn')}</kbd>in <kbd>${kl('clipOut')}</kbd>out <kbd>${kl('clipLoop')}</kbd>loop <kbd>${kl('record')}</kbd>rec <kbd>${kl('webcam')}</kbd>cam <kbd>${kl('play')}</kbd>play <kbd>${kl('skipBack')}</kbd><kbd>${kl('skipFwd')}</kbd>±5s`;
+  h.innerHTML=`<span style="color:var(--accent2);margin-right:4px;">PLAYBACK</span><kbd>${kl('rev4x')}</kbd>4xrev <kbd>${kl('rev2x')}</kbd>2xrev <kbd>${kl('revHalf')}</kbd>½rev <kbd>${kl('play')}</kbd>play <kbd>${kl('fwdHalf')}</kbd>½fwd <kbd>${kl('fwd2x')}</kbd>2xfwd <kbd>${kl('skipBack')}</kbd><kbd>${kl('skipFwd')}</kbd>±5s &nbsp;<span style="color:var(--accent2);margin-right:4px;">DRAW</span><kbd>${kl('pen')}</kbd>pen <kbd>${kl('circle')}</kbd>circle <kbd>${kl('triangle')}</kbd>tri <kbd>${kl('clear')}</kbd>clear <kbd>${kl('undo')}</kbd>undo <kbd>${kl('fade')}</kbd>fade &nbsp;<span style="color:var(--accent2);margin-right:4px;">LOOP</span><kbd>${kl('clipIn')}</kbd>in <kbd>${kl('clipOut')}</kbd>out <kbd>${kl('clipLoop')}</kbd>loop <kbd>${kl('clipClear')}</kbd>clear &nbsp;<span style="color:var(--accent2);margin-right:4px;">REC</span><kbd>${kl('record')}</kbd>rec <kbd>${kl('webcam')}</kbd>cam`;
 }
 updateShortcutHint();
 
