@@ -275,14 +275,13 @@
       // Upgrade button
       document.getElementById('btn-upgrade').addEventListener('click',()=>{
         document.getElementById('btn-upgrade').textContent='Opening checkout...';
-        window.$memberstackDom.openModal('SIGNUP', {
+        window.$memberstackDom.openModal('CHECKOUT', {
           planId: 'prc_pro-monthly-7v5w0ac0'
         }).then(()=>{
           window.location.href='/app.html';
         }).catch(err=>{
           console.error(err);
           document.getElementById('btn-upgrade').textContent='⬆ Upgrade to Pro — $9.99/month';
-          alert('Something went wrong. Please try again.');
         });
       });
 
