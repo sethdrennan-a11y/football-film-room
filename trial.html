@@ -199,7 +199,11 @@
 </style>
 <script async src="https://static.memberstack.com/scripts/v1/memberstack.js" data-memberstack-app="app_cmog066pl001u0suadgpg795a"></script>
 <script>
-  function waitForMS(cb,t=0){if(window.$memberstackDom){cb();return;}if(t>40)return;setTimeout(()=>waitForMS(cb,t+1),100);}
+  function waitForMS(cb,t=0){
+    if(window.$memberstackDom){cb();return;}
+    if(t>80){console.warn('Memberstack timed out');return;}
+    setTimeout(()=>waitForMS(cb,t+1),100);
+  }
   window.addEventListener('DOMContentLoaded',()=>{
     waitForMS(()=>{
       window.$memberstackDom.getCurrentMember().then(({data:member})=>{
