@@ -214,7 +214,7 @@
       acctMenu.id='acct-menu';
       acctMenu.style.cssText='display:none;position:fixed;top:42px;right:8px;background:#1e262f;border:1px solid rgba(255,255,255,0.1);border-radius:8px;overflow:hidden;z-index:300;min-width:160px;box-shadow:0 8px 32px rgba(0,0,0,0.5);';
       acctMenu.innerHTML=`
-        <div id="acct-upgrade" style="padding:10px 16px;font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:.04em;color:#e8b84b;cursor:pointer;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(255,255,255,0.07);">
+        <div id="acct-upgrade" data-ms-price:add="prc_monthly-my1o03py" style="padding:10px 16px;font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:.04em;color:#e8b84b;cursor:pointer;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(255,255,255,0.07);">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>Upgrade to Pro
         </div>
         <div id="acct-profile" style="padding:10px 16px;font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:.04em;color:#e8eaed;cursor:pointer;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(255,255,255,0.07);">
@@ -231,9 +231,7 @@
       });
       document.getElementById('acct-upgrade').addEventListener('click',(e)=>{
         e.stopPropagation();acctMenu.style.display='none';menuOpen=false;
-        window.$memberstackDom.purchasePlansWithCheckout({
-          priceId:'prc_monthly-my1o03py'
-        }).then(()=>window.location.reload());
+        // data-ms-price:add attribute handles the checkout automatically
       });
       document.getElementById('acct-profile').addEventListener('click',(e)=>{e.stopPropagation();acctMenu.style.display='none';menuOpen=false;window.$memberstackDom.openModal('PROFILE');});
       document.getElementById('acct-logout').addEventListener('click',(e)=>{e.stopPropagation();window.$memberstackDom.logout().then(()=>window.location.href='/');});
