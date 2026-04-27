@@ -113,23 +113,6 @@
     color: var(--text);
     margin-bottom: 4px;
   }
-  <!-- 1. The Upgrade / Free Trial Button -->
-<!-- IMPORTANT: Replace prc_12345 with your actual Price ID -->
-<button class="btn btn-primary" data-ms-price:add="prc_pro-monthly-7v5w0ac0">
-  Start 7-Day Free Trial
-</button>
-
-<!-- 2. The Manage Billing Button -->
-<!-- This automatically opens the Stripe Customer Portal so they can cancel or update cards -->
-<button class="btn btn-secondary" data-ms-action="customer-portal">
-  Manage Billing
-</button>
-
-<!-- 3. The Logout Button -->
-<button class="btn btn-secondary" data-ms-action="logout">
-  Log Out
-</button>
-  }
   .plan-badge {
     display: inline-flex;
     align-items: center;
@@ -239,28 +222,24 @@
     <div class="card" id="upgrade-card" style="display:none;">
       <div class="card-title">Upgrade</div>
       <p style="font-size:14px;color:var(--muted);margin-bottom:16px;line-height:1.6;">Get full access — no watermarks, all features unlocked.</p>
-      <button class="btn btn-primary" id="btn-upgrade">⬆ Upgrade to Pro — $9.99/month</button>
+      <button class="btn btn-primary" data-ms-price:add="prc_pro-monthly-7v5w0ac0">⬆ Start 7-Day Free Trial — then $9.99/month</button>
     </div>
 
     <div class="card" id="manage-card" style="display:none;">
       <div class="card-title">Subscription</div>
       <p style="font-size:14px;color:var(--muted);margin-bottom:16px;line-height:1.6;">Update your payment method, view invoices, or cancel your subscription.</p>
-      <button class="btn btn-secondary" id="btn-manage">Manage Billing</button>
+      <button class="btn btn-secondary" data-ms-action="customer-portal">Manage Billing</button>
     </div>
 
     <div class="card">
       <div class="card-title">Session</div>
-      <button class="btn btn-danger" id="btn-logout">Log Out</button>
+      <button class="btn btn-danger" data-ms-action="logout">Log Out</button>
     </div>
   </div>
 </main>
 
 <script>
-  function waitForMS(cb,t=0){
-    if(window.$memberstackDom){cb();return;}
-    if(t>80){document.getElementById('loading').textContent='Could not connect. Please refresh.';return;}
-    setTimeout(()=>waitForMS(cb,t+1),100);
-  }
+  function waitForMS(cb,t=0){if(window.$memberstackDom){cb();return;}if(t>80){document.getElementById('loading').textContent='Could not connect. Please refresh.';return;}setTimeout(()=>waitForMS(cb,t+1),100);}
 
   waitForMS(()=>{
     window.$memberstackDom.getCurrentMember().then(({data:member})=>{
@@ -288,33 +267,6 @@
         badgeWrap.innerHTML='<div class="plan-badge trial"><div class="dot"></div>Free Trial</div>';
         document.getElementById('upgrade-card').style.display='block';
       }
-
-      // Upgrade button
-      document.getElementById('btn-upgrade').addEventListener('click',()=>{
-        document.getElementById('btn-upgrade').textContent='Opening checkout...';
-        window.$memberstackDom.openModal('CHECKOUT', {
-          planId: 'prc_pro-monthly-7v5w0ac0'
-        }).then(()=>{
-          window.location.href='/app.html';
-        }).catch(err=>{
-          console.error(err);
-          document.getElementById('btn-upgrade').textContent='⬆ Upgrade to Pro — $9.99/month';
-        });
-      });
-
-      // Manage billing
-      const manageBtn=document.getElementById('btn-manage');
-      if(manageBtn){
-        manageBtn.addEventListener('click',()=>{
-          manageBtn.textContent='Opening billing portal...';
-          window.$memberstackDom.openModal('PROFILE');
-        });
-      }
-
-      // Logout
-      document.getElementById('btn-logout').addEventListener('click',()=>{
-        window.$memberstackDom.logout().then(()=>window.location.href='/');
-      });
     });
   });
 </script>
