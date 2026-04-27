@@ -1374,6 +1374,27 @@ function drawCompositeFrame(){
     recCtx.lineTo(bx,by+r);recCtx.quadraticCurveTo(bx,by,bx+r,by);
     recCtx.closePath();recCtx.stroke();recCtx.restore();
   }
+
+  // Watermark — always baked into recording
+  const fs=Math.max(22,Math.round(vw*0.038));
+  recCtx.save();
+  recCtx.translate(vw/2,vh/2);
+  recCtx.rotate(-Math.PI/4);
+  recCtx.font=`900 ${fs}px Arial, sans-serif`;
+  recCtx.textAlign='center';
+  recCtx.textBaseline='middle';
+  const wmText='MYFILMROOM.COM — FREE TRIAL';
+  const wmTw=recCtx.measureText(wmText).width+80;
+  const wmDiag=Math.sqrt(vw*vw+vh*vh);
+  for(let wx=-wmDiag;wx<wmDiag;wx+=wmTw){
+    for(let wy=-wmDiag;wy<wmDiag;wy+=fs*3.5){
+      recCtx.strokeStyle='rgba(0,0,0,0.5)';recCtx.lineWidth=4;
+      recCtx.strokeText(wmText,wx,wy);
+      recCtx.fillStyle='rgba(255,255,255,0.45)';
+      recCtx.fillText(wmText,wx,wy);
+    }
+  }
+  recCtx.restore();
 }
 
 async function startRecording(){
