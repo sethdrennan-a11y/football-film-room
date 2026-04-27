@@ -211,11 +211,7 @@
     document.addEventListener('click',()=>{acctMenu.style.display='none';menuOpen=false;});
     document.getElementById('acct-upgrade').addEventListener('click',(e)=>{
       e.stopPropagation();acctMenu.style.display='none';menuOpen=false;
-      waitForMS(()=>{
-        window.$memberstackDom.purchasePlansWithCheckout({priceId:'prc_monthly-my1o03py'})
-          .then(()=>window.location.href='/app.html')
-          .catch(err=>console.error(err));
-      });
+      window.location.href='https://buy.stripe.com/aFa3cu744fQ6eJH2mJ7bW00';
     });
     document.getElementById('acct-profile').addEventListener('click',(e)=>{
       e.stopPropagation();acctMenu.style.display='none';menuOpen=false;
