@@ -231,10 +231,8 @@
       });
       document.getElementById('acct-upgrade').addEventListener('click',(e)=>{
         e.stopPropagation();acctMenu.style.display='none';menuOpen=false;
-        // Use Memberstack's openModal with the price ID
-        window.$memberstackDom.openModal('CHECKOUT', {
-          planId: 'pln_subscriber-jk6d0eo5',
-          priceId: 'prc_monthly-my1o03py'
+        window.$memberstackDom.purchasePlansWithCheckout({
+          priceId:'prc_monthly-my1o03py'
         }).then(()=>{ window.location.href='/app.html'; })
         .catch(err=>console.error('Checkout error:',err));
       });
