@@ -198,34 +198,6 @@
   .tippy kbd{background:rgba(232,184,75,0.15);border:1px solid rgba(232,184,75,0.3);border-radius:3px;padding:1px 5px;font-size:11px;color:#e8b84b;font-family:monospace;margin-left:5px;}
 </style>
 <script async src="https://static.memberstack.com/scripts/v1/memberstack.js" data-memberstack-app="app_cmog066pl001u0suadgpg795a"></script>
-<script>
-  function waitForMS(cb,t=0){if(window.$memberstackDom){cb();return;}if(t>80)return;setTimeout(()=>waitForMS(cb,t+1),100);}
-  window.addEventListener('DOMContentLoaded',()=>{
-    document.getElementById('btn-upgrade').addEventListener('click',()=>{
-      waitForMS(()=>{
-        window.$memberstackDom.purchasePlansWithCheckout({priceId:'prc_monthly-my1o03py'})
-          .then(()=>window.location.href='/app.html')
-          .catch(err=>console.error(err));
-      });
-    });
-    document.getElementById('btn-logout').addEventListener('click',()=>{
-      waitForMS(()=>window.$memberstackDom.logout().then(()=>window.location.href='/'));
-    });
-    document.getElementById('btn-account').addEventListener('click',()=>{
-      waitForMS(()=>window.$memberstackDom.openModal('PROFILE'));
-    });
-    waitForMS(()=>{
-      window.$memberstackDom.getCurrentMember().then(({data:member})=>{
-        if(!member){window.location.href='/';return;}
-        const hasSub=(member.planConnections||[]).some(p=>p.planId==='pln_subscriber-jk6d0eo5'&&p.status==='ACTIVE');
-        if(hasSub)window.location.href='/app.html';
-        if(member.auth?.email){
-          document.getElementById('btn-account').innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>${member.auth.email.split('@')[0]}`;
-        }
-      });
-    });
-  });
-</script>
 </head>
 <body>
 <input type="file" id="file-single" accept="video/*">
@@ -1481,6 +1453,42 @@ function positionTip(e){
   if(y<8) y=e.clientY+20;
   tip.style.left=x+'px';tip.style.top=y+'px';
 }
+</script>
+<script>
+  function waitForMS(cb,t=0){if(window.$memberstackDom){cb();return;}if(t>80)return;setTimeout(()=>waitForMS(cb,t+1),100);}
+  function initButtons(){
+    const upgradeBtn=document.getElementById('btn-upgrade');
+    const logoutBtn=document.getElementById('btn-logout');
+    const accountBtn=document.getElementById('btn-account');
+    if(!upgradeBtn||!logoutBtn){setTimeout(initButtons,50);return;}
+    upgradeBtn.addEventListener('click',()=>{
+      waitForMS(()=>{
+        window.$memberstackDom.purchasePlansWithCheckout({priceId:'prc_pro-monthly-7v5w0ac0'})
+          .then(()=>window.location.href='/app.html')
+          .catch(err=>console.error('checkout error:',err));
+      });
+    });
+    logoutBtn.addEventListener('click',()=>{
+      waitForMS(()=>window.$memberstackDom.logout().then(()=>window.location.href='/'));
+    });
+    accountBtn.addEventListener('click',()=>{
+      waitForMS(()=>window.$memberstackDom.openModal('PROFILE'));
+    });
+    waitForMS(()=>{
+      window.$memberstackDom.getCurrentMember().then(({data:member})=>{
+        if(!member){window.location.href='/';return;}
+        const plans=member.planConnections||[];
+        const isTrialing=plans.some(p=>p.planId==='pln_subscriber-jk6d0eo5'&&p.status==='TRIALING');
+        const isPaid=plans.some(p=>p.planId==='pln_subscriber-jk6d0eo5'&&p.status==='ACTIVE');
+        // If fully paid (not trialing) → upgrade to app
+        if(isPaid&&!isTrialing)window.location.href='/app.html';
+        if(member.auth?.email){
+          accountBtn.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>${member.auth.email.split('@')[0]}`;
+        }
+      });
+    });
+  }
+  initButtons();
 </script>
 </body>
 </html>

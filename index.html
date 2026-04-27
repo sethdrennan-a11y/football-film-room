@@ -837,15 +837,15 @@
 
   function redirectMember(member) {
     if (!member) return;
-    const hasSub = (member.planConnections||[]).some(p =>
-      p.planId === 'pln_subscriber-jk6d0eo5' && p.status === 'ACTIVE'
-    );
-    window.location.href = hasSub ? '/app.html' : '/trial.html';
+    const plans = member.planConnections||[];
+    const isPaid = plans.some(p => p.planId === 'pln_subscriber-jk6d0eo5' && p.status === 'ACTIVE' && p.status !== 'TRIALING');
+    // Paid subscribers → app, everyone else (trial) → trial.html
+    window.location.href = isPaid ? '/app.html' : '/trial.html';
   }
 
   function openSignup() {
     waitForMemberstack(() => {
-      window.$memberstackDom.openModal('SIGNUP', { planId: 'pln_free-trial-n66c0e43' })
+      window.$memberstackDom.openModal('SIGNUP', { planId: 'pln_subscriber-jk6d0eo5' })
         .then(() => window.location.reload());
     });
   }

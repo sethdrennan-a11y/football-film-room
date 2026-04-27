@@ -204,8 +204,8 @@
     waitForMS(()=>{
       window.$memberstackDom.getCurrentMember().then(({data:member})=>{
         if(!member){window.location.href='/';return;}
-        const hasSub=(member.planConnections||[]).some(p=>p.planId==='pln_subscriber-jk6d0eo5'&&p.status==='ACTIVE');
-        if(!hasSub)window.location.href='trial.html';
+        const hasSub=(member.planConnections||[]).some(p=>p.planId==='pln_subscriber-jk6d0eo5'&&(p.status==='ACTIVE'||p.status==='TRIALING'));
+        if(!hasSub)window.location.href='/trial.html';
         if(member.auth?.email){
           document.getElementById('btn-account').innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>${member.auth.email.split('@')[0]}`;
         }
