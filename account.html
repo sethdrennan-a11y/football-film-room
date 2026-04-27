@@ -253,8 +253,8 @@
       document.getElementById('welcome-text').textContent='Welcome back, '+email.split('@')[0];
 
       const plans=member.planConnections||[];
-      const isTrialing=plans.some(p=>p.planId==='pln_subscriber-jk6d0eo5'&&p.status==='TRIALING');
-      const isPaid=plans.some(p=>p.planId==='pln_subscriber-jk6d0eo5'&&(p.status==='ACTIVE'||p.status==='TRIALING'));
+      const isTrialing=plans.some(p=>p.planId==='pln_subscriber-lox03oo'&&p.status==='TRIALING');
+      const isPaid=plans.some(p=>p.planId==='pln_subscriber-lox03oo'&&(p.status==='ACTIVE'||p.status==='TRIALING'));
 
       const badgeWrap=document.getElementById('plan-badge-wrap');
       if(isTrialing){

@@ -1458,8 +1458,8 @@ function positionTip(e){
     window.$memberstackDom.getCurrentMember().then(({data:member})=>{
       if(!member){window.location.href='/';return;}
       const plans=member.planConnections||[];
-      const isPaid=plans.some(p=>p.planId==='pln_subscriber-jk6d0eo5'&&p.status==='ACTIVE');
-      const isTrialing=plans.some(p=>p.planId==='pln_subscriber-jk6d0eo5'&&p.status==='TRIALING');
+      const isPaid=plans.some(p=>p.planId==='pln_subscriber-lox03oo'&&p.status==='ACTIVE');
+      const isTrialing=plans.some(p=>p.planId==='pln_subscriber-lox03oo'&&p.status==='TRIALING');
       if(isPaid&&!isTrialing)window.location.href='/app.html';
     });
   });
