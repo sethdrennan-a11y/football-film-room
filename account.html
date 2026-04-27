@@ -275,8 +275,8 @@
       // Upgrade button
       document.getElementById('btn-upgrade').addEventListener('click',()=>{
         document.getElementById('btn-upgrade').textContent='Opening checkout...';
-        window.$memberstackDom.purchasePlansWithCheckout({
-          priceId:'prc_pro-monthly-7v5w0ac0'
+        window.$memberstackDom.openModal('SIGNUP', {
+          planId: 'prc_pro-monthly-7v5w0ac0'
         }).then(()=>{
           window.location.href='/app.html';
         }).catch(err=>{
