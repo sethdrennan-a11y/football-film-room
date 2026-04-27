@@ -1259,15 +1259,15 @@ document.getElementById('btn-export').addEventListener('click',()=>{
   } else {
     oc.drawImage(video,0,0,vw,vh);
     if(canvas.width&&canvas.height) oc.drawImage(canvas,0,0,vw,vh);
-  // Bake watermark into export
+  }
+  // Always bake watermark into export
   const wmOff=document.createElement('canvas');wmOff.width=vw;wmOff.height=vh;
   const woc=wmOff.getContext('2d');woc.save();woc.rotate(-Math.PI/4);
   const fs=Math.max(22,Math.round(vw*0.038));
-  woc.font=`900 ${fs}px Arial`;woc.fillStyle='rgba(255,255,255,0.28)';woc.strokeStyle='rgba(0,0,0,0.18)';woc.lineWidth=3;
+  woc.font=`900 ${fs}px Arial`;woc.fillStyle='rgba(255,255,255,0.35)';woc.strokeStyle='rgba(0,0,0,0.25)';woc.lineWidth=3;
   const wt='MYFILMROOM.COM — FREE TRIAL',tw2=woc.measureText(wt).width+60,diag2=Math.sqrt(vw*vw+vh*vh);
   for(let x=-diag2;x<diag2*2;x+=tw2)for(let y=-diag2;y<diag2*2;y+=fs*3.5){woc.strokeText(wt,x,y);woc.fillText(wt,x,y);}
   woc.restore();oc.drawImage(wmOff,0,0,vw,vh);
-  }
   const link=document.createElement('a');
   link.download=`filmroom-${filenameDisplay.textContent.replace(/\.[^.]+$/,'').substring(0,30)}-${fmt(video.currentTime).replace(':','m')}s.png`;
   link.href=off.toDataURL('image/png');link.click();showToast('Frame exported as PNG');
