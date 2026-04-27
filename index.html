@@ -838,14 +838,13 @@
   function redirectMember(member) {
     if (!member) return;
     const plans = member.planConnections||[];
-    const isPaid = plans.some(p => p.planId === 'pln_subscriber-lox03oo' && p.status === 'ACTIVE' && p.status !== 'TRIALING');
-    // Paid subscribers → app, everyone else (trial) → trial.html
+    const isPaid = (member.planConnections||[]).some(p => p.status === 'ACTIVE');
     window.location.href = isPaid ? '/app.html' : '/trial.html';
   }
 
   function openSignup() {
     waitForMemberstack(() => {
-      window.$memberstackDom.openModal('SIGNUP', { planId: 'pln_subscriber-lox03oo' })
+      window.$memberstackDom.openModal('SIGNUP')
         .then(() => window.location.reload());
     });
   }

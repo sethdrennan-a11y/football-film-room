@@ -229,7 +229,7 @@
     <div class="card" id="upgrade-card">
       <div class="card-title">Unlock Full App</div>
       <p style="font-size:14px;color:var(--muted);margin-bottom:16px;line-height:1.6;">Remove the watermark and get full access right now. Your card on file will be charged immediately.</p>
-      <button class="btn btn-primary" data-ms-price:update="prc_pro-monthly-instant-access-ii810aq6" id="upgrade-btn">
+      <button class="btn btn-primary" data-ms-price:add="prc_pro-monthly-mg990a5y" id="upgrade-btn">
         Unlock Full App Now — $9.99/month
       </button>
     </div>
@@ -258,13 +258,8 @@
       if(!member){window.location.href='/';return;}
       document.getElementById('loading').style.display='none';
       document.getElementById('content').style.display='block';
-      // Hide upgrade button for fully active (non-trialing) subscribers
-      const plans=member.planConnections||[];
-      const isActive=plans.some(p=>(p.planId==='pln_subscriber-lox03oo'||p.planId==='pln_subscriber-instant-access-ba36039h')&&p.status==='ACTIVE');
-      const isTrialing=plans.some(p=>p.planId==='pln_subscriber-lox03oo'&&p.status==='TRIALING');
-      if(isActive&&!isTrialing){
-        document.getElementById('upgrade-card').style.display='none';
-      }
+      const isPaid=(member.planConnections||[]).some(p=>p.status==='ACTIVE');
+      if(isPaid)document.getElementById('upgrade-card').style.display='none';
     });
   });
 </script>

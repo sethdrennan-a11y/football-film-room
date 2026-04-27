@@ -202,9 +202,9 @@
   function waitForMS(cb,t=0){if(window.$memberstackDom){cb();return;}if(t>80)return;setTimeout(()=>waitForMS(cb,t+1),100);}
   waitForMS(()=>{
     window.$memberstackDom.getCurrentMember().then(({data:member})=>{
-      if(!member){window.location.href='/';return;}
-      const hasSub=(member.planConnections||[]).some(p=>( p.planId==='pln_subscriber-lox03oo'||p.planId==='pln_subscriber-instant-access-ba36039h')p.planId==='pln_subscriber-lox03oo'&&(p.status==='ACTIVE'||p.status==='TRIALING')p.planId==='pln_subscriber-lox03oo'&&(p.status==='ACTIVE'||p.status==='TRIALING')(p.status==='ACTIVE'||p.status==='TRIALING'));
-      if(!hasSub)window.location.href='/trial.html';
+      if(!member){window.location.href='/trial.html';return;}
+      const isPaid=(member.planConnections||[]).some(p=>p.status==='ACTIVE');
+      if(!isPaid)window.location.href='/trial.html';
     });
   });
 </script>

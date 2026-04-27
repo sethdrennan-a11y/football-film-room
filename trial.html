@@ -213,6 +213,7 @@
   <button class="tb-btn" id="btn-record"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><circle id="rec-dot" cx="12" cy="12" r="4" fill="currentColor"/></svg>Record</button>
 
   <div class="spacer"></div>
+  <button data-ms-price:add="prc_pro-monthly-mg990a5y" style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:6px 14px;background:var(--gold);color:#0a0c0f;border:none;border-radius:4px;cursor:pointer;">⬆ Upgrade to Pro</button>
   <a href="/account.html" class="tb-btn" style="text-decoration:none;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>Account</a>
 </div>
 
@@ -1456,11 +1457,9 @@ function positionTip(e){
   function waitForMS(cb,t=0){if(window.$memberstackDom){cb();return;}if(t>80)return;setTimeout(()=>waitForMS(cb,t+1),100);}
   waitForMS(()=>{
     window.$memberstackDom.getCurrentMember().then(({data:member})=>{
-      if(!member){window.location.href='/';return;}
-      const plans=member.planConnections||[];
-      const isPaid=plans.some(p=>(p.planId==='pln_subscriber-lox03oo'||p.planId==='pln_subscriber-instant-access-ba36039h')&&p.status==='ACTIVE');
-      const isTrialing=plans.some(p=>p.planId==='pln_subscriber-lox03oo'&&p.status==='TRIALING');
-      if(isPaid&&!isTrialing)window.location.href='/app.html';
+      if(!member)return; // Free users stay here, no redirect needed
+      const isPaid=(member.planConnections||[]).some(p=>p.status==='ACTIVE');
+      if(isPaid)window.location.href='/app.html';
     });
   });
 </script>
