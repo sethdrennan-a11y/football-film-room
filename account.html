@@ -113,6 +113,23 @@
     color: var(--text);
     margin-bottom: 4px;
   }
+  <!-- 1. The Upgrade / Free Trial Button -->
+<!-- IMPORTANT: Replace prc_12345 with your actual Price ID -->
+<button class="btn btn-primary" data-ms-price:add="prc_pro-monthly-7v5w0ac0">
+  Start 7-Day Free Trial
+</button>
+
+<!-- 2. The Manage Billing Button -->
+<!-- This automatically opens the Stripe Customer Portal so they can cancel or update cards -->
+<button class="btn btn-secondary" data-ms-action="customer-portal">
+  Manage Billing
+</button>
+
+<!-- 3. The Logout Button -->
+<button class="btn btn-secondary" data-ms-action="logout">
+  Log Out
+</button>
+  }
   .plan-badge {
     display: inline-flex;
     align-items: center;
