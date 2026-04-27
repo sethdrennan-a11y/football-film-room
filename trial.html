@@ -9,7 +9,7 @@
   :root{--bg:#0d0f12;--surface:#161a1f;--surface2:#1e2429;--border:rgba(255,255,255,0.07);--accent:#e8b84b;--accent2:#3a8fd4;--text:#e8eaed;--muted:#6b7280;--toolbar-w:48px;--playlist-w:240px;--red:#e05252;--green:#4caf82;}
   *{box-sizing:border-box;margin:0;padding:0;}
   body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden;}
-  #topbar{height:42px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;flex-shrink:0;z-index:10;}
+  #topbar{height:42px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;flex-shrink:0;z-index:100;position:relative;}
   #topbar .logo{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;letter-spacing:.08em;color:var(--accent);padding:0 14px;border-right:1px solid var(--border);height:100%;display:flex;align-items:center;white-space:nowrap;text-transform:uppercase;}
   #topbar .logo span{color:var(--text);font-weight:400;}
   .tb-btn{height:100%;padding:0 12px;background:none;border:none;border-right:1px solid var(--border);color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;gap:6px;transition:color .15s,background .15s;white-space:nowrap;}
