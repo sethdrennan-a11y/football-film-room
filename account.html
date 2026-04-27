@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Account — Film Room</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<script async src="https://static.memberstack.com/scripts/v1/memberstack.js" data-memberstack-app="app_cmog066pl001u0suadgpg795a"></script>
+<style>
+  :root {
+    --bg: #0a0c0f;
+    --surface: #13171c;
+    --surface2: #1a2029;
+    --border: rgba(255,255,255,0.08);
+    --gold: #e8b84b;
+    --text: #edf0f3;
+    --muted: #5a6475;
+    --red: #e05252;
+    --green: #3ddc84;
+    --blue: #3a8fd4;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Barlow', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* TOPBAR */
+  #topbar {
+    height: 52px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    gap: 16px;
+  }
+  .logo {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 18px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold);
+    text-decoration: none;
+  }
+  .logo span { color: rgba(237,240,243,0.4); font-weight: 400; }
+  .back-btn {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 5px 12px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .back-btn:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+
+  /* MAIN */
+  main {
+    flex: 1;
+    max-width: 600px;
+    margin: 48px auto;
+    padding: 0 24px;
+    width: 100%;
+  }
+
+  h1 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+  .subtitle {
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 40px;
+  }
+
+  /* CARDS */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+  .card-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+  .member-email {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .plan-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 20px;
+    margin-top: 8px;
+  }
+  .plan-badge.trial {
+    background: rgba(232,184,75,0.12);
+    border: 1px solid rgba(232,184,75,0.3);
+    color: var(--gold);
+  }
+  .plan-badge.active {
+    background: rgba(61,220,132,0.12);
+    border: 1px solid rgba(61,220,132,0.3);
+    color: var(--green);
+  }
+  .plan-badge .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  /* BUTTONS */
+  .btn {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 12px 24px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    text-align: center;
+    transition: all 0.15s;
+    display: block;
+    margin-bottom: 10px;
+    text-decoration: none;
+  }
+  .btn-primary {
+    background: var(--gold);
+    color: #0a0c0f;
+  }
+  .btn-primary:hover { background: #f0c45a; }
+  .btn-secondary {
+    background: var(--surface2);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .btn-secondary:hover { border-color: rgba(255,255,255,0.2); }
+  .btn-danger {
+    background: none;
+    color: var(--red);
+    border: 1px solid rgba(224,82,82,0.3);
+  }
+  .btn-danger:hover { background: rgba(224,82,82,0.08); }
+
+  #loading {
+    text-align: center;
+    padding: 80px 0;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 14px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  #content { display: none; }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 16px 0;
+  }
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <a href="/" class="logo">Film <span>Room</span></a>
+  <a href="javascript:history.back()" class="back-btn">← Back to App</a>
+</div>
+
+<main>
+  <div id="loading">Loading your account...</div>
+
+  <div id="content">
+    <h1>My Account</h1>
+    <p class="subtitle" id="welcome-text">Manage your Film Room subscription</p>
+
+    <!-- Account Info -->
+    <div class="card">
+      <div class="card-title">Account</div>
+      <div class="member-email" id="member-email">—</div>
+      <div id="plan-badge-wrap"></div>
+    </div>
+
+    <!-- Actions -->
+    <div class="card" id="upgrade-card" style="display:none;">
+      <div class="card-title">Upgrade</div>
+      <p style="font-size:14px;color:var(--muted);margin-bottom:16px;line-height:1.6;">Get full access — no watermarks, all features unlocked.</p>
+      <button class="btn btn-primary" id="btn-upgrade">⬆ Upgrade to Pro — $9.99/month</button>
+    </div>
+
+    <div class="card" id="manage-card" style="display:none;">
+      <div class="card-title">Subscription</div>
+      <p style="font-size:14px;color:var(--muted);margin-bottom:16px;line-height:1.6;">Update your payment method, view invoices, or cancel your subscription.</p>
+      <button class="btn btn-secondary" id="btn-manage">Manage Billing</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Session</div>
+      <button class="btn btn-danger" id="btn-logout">Log Out</button>
+    </div>
+  </div>
+</main>
+
+<script>
+  function waitForMS(cb,t=0){
+    if(window.$memberstackDom){cb();return;}
+    if(t>80){document.getElementById('loading').textContent='Could not connect. Please refresh.';return;}
+    setTimeout(()=>waitForMS(cb,t+1),100);
+  }
+
+  waitForMS(()=>{
+    window.$memberstackDom.getCurrentMember().then(({data:member})=>{
+      if(!member){window.location.href='/';return;}
+
+      document.getElementById('loading').style.display='none';
+      document.getElementById('content').style.display='block';
+
+      const email=member.auth?.email||'';
+      document.getElementById('member-email').textContent=email;
+      document.getElementById('welcome-text').textContent='Welcome back, '+email.split('@')[0];
+
+      const plans=member.planConnections||[];
+      const isTrialing=plans.some(p=>p.planId==='pln_subscriber-jk6d0eo5'&&p.status==='TRIALING');
+      const isPaid=plans.some(p=>p.planId==='pln_subscriber-jk6d0eo5'&&(p.status==='ACTIVE'||p.status==='TRIALING'));
+
+      const badgeWrap=document.getElementById('plan-badge-wrap');
+      if(isTrialing){
+        badgeWrap.innerHTML='<div class="plan-badge trial"><div class="dot"></div>Free Trial</div>';
+        document.getElementById('upgrade-card').style.display='block';
+      } else if(isPaid){
+        badgeWrap.innerHTML='<div class="plan-badge active"><div class="dot"></div>Pro Subscriber</div>';
+        document.getElementById('manage-card').style.display='block';
+      } else {
+        badgeWrap.innerHTML='<div class="plan-badge trial"><div class="dot"></div>Free Trial</div>';
+        document.getElementById('upgrade-card').style.display='block';
+      }
+
+      // Upgrade button
+      document.getElementById('btn-upgrade').addEventListener('click',()=>{
+        document.getElementById('btn-upgrade').textContent='Opening checkout...';
+        window.$memberstackDom.purchasePlansWithCheckout({
+          priceId:'prc_pro-monthly-7v5w0ac0'
+        }).then(()=>{
+          window.location.href='/app.html';
+        }).catch(err=>{
+          console.error(err);
+          document.getElementById('btn-upgrade').textContent='⬆ Upgrade to Pro — $9.99/month';
+          alert('Something went wrong. Please try again.');
+        });
+      });
+
+      // Manage billing
+      const manageBtn=document.getElementById('btn-manage');
+      if(manageBtn){
+        manageBtn.addEventListener('click',()=>{
+          manageBtn.textContent='Opening billing portal...';
+          window.$memberstackDom.openModal('PROFILE');
+        });
+      }
+
+      // Logout
+      document.getElementById('btn-logout').addEventListener('click',()=>{
+        window.$memberstackDom.logout().then(()=>window.location.href='/');
+      });
+    });
+  });
+</script>
+</body>
+</html>

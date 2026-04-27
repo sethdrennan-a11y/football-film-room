@@ -213,9 +213,7 @@
   <button class="tb-btn" id="btn-record"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><circle id="rec-dot" cx="12" cy="12" r="4" fill="currentColor"/></svg>Record</button>
 
   <div class="spacer"></div>
-  <button class="tb-btn" id="btn-account" title="Account"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>Account</button>
-  <button class="tb-btn" id="btn-upgrade" style="color:var(--gold);border-color:rgba(232,184,75,0.3);" title="Upgrade to Pro">⬆ Upgrade</button>
-  <button class="tb-btn" id="btn-logout" style="color:var(--red);" title="Log Out">Log Out</button>
+  <a href="/account.html" class="tb-btn" style="text-decoration:none;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>Account</a>
 </div>
 
 <div id="acct-menu" style="display:none"></div>
@@ -1456,39 +1454,15 @@ function positionTip(e){
 </script>
 <script>
   function waitForMS(cb,t=0){if(window.$memberstackDom){cb();return;}if(t>80)return;setTimeout(()=>waitForMS(cb,t+1),100);}
-  function initButtons(){
-    const upgradeBtn=document.getElementById('btn-upgrade');
-    const logoutBtn=document.getElementById('btn-logout');
-    const accountBtn=document.getElementById('btn-account');
-    if(!upgradeBtn||!logoutBtn){setTimeout(initButtons,50);return;}
-    upgradeBtn.addEventListener('click',()=>{
-      waitForMS(()=>{
-        window.$memberstackDom.purchasePlansWithCheckout({priceId:'prc_pro-monthly-7v5w0ac0'})
-          .then(()=>window.location.href='/app.html')
-          .catch(err=>console.error('checkout error:',err));
-      });
+  waitForMS(()=>{
+    window.$memberstackDom.getCurrentMember().then(({data:member})=>{
+      if(!member){window.location.href='/';return;}
+      const plans=member.planConnections||[];
+      const isPaid=plans.some(p=>p.planId==='pln_subscriber-jk6d0eo5'&&p.status==='ACTIVE');
+      const isTrialing=plans.some(p=>p.planId==='pln_subscriber-jk6d0eo5'&&p.status==='TRIALING');
+      if(isPaid&&!isTrialing)window.location.href='/app.html';
     });
-    logoutBtn.addEventListener('click',()=>{
-      waitForMS(()=>window.$memberstackDom.logout().then(()=>window.location.href='/'));
-    });
-    accountBtn.addEventListener('click',()=>{
-      waitForMS(()=>window.$memberstackDom.openModal('PROFILE'));
-    });
-    waitForMS(()=>{
-      window.$memberstackDom.getCurrentMember().then(({data:member})=>{
-        if(!member){window.location.href='/';return;}
-        const plans=member.planConnections||[];
-        const isTrialing=plans.some(p=>p.planId==='pln_subscriber-jk6d0eo5'&&p.status==='TRIALING');
-        const isPaid=plans.some(p=>p.planId==='pln_subscriber-jk6d0eo5'&&p.status==='ACTIVE');
-        // If fully paid (not trialing) → upgrade to app
-        if(isPaid&&!isTrialing)window.location.href='/app.html';
-        if(member.auth?.email){
-          accountBtn.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>${member.auth.email.split('@')[0]}`;
-        }
-      });
-    });
-  }
-  initButtons();
+  });
 </script>
 </body>
 </html>
