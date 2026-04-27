@@ -1252,6 +1252,7 @@ document.getElementById('btn-export').addEventListener('click',()=>{
   const off=document.createElement('canvas');
   off.width=vw;off.height=vh;
   const oc=off.getContext('2d');
+  // Draw video frame
   if(state.zoom>1){
     const{sx,sy,sw,sh}=getCropRect();
     oc.drawImage(video,sx,sy,sw,sh,0,0,vw,vh);
@@ -1260,17 +1261,32 @@ document.getElementById('btn-export').addEventListener('click',()=>{
     oc.drawImage(video,0,0,vw,vh);
     if(canvas.width&&canvas.height) oc.drawImage(canvas,0,0,vw,vh);
   }
-  // Always bake watermark into export
-  const wmOff=document.createElement('canvas');wmOff.width=vw;wmOff.height=vh;
-  const woc=wmOff.getContext('2d');woc.save();woc.rotate(-Math.PI/4);
+  // Draw watermark directly onto export canvas
   const fs=Math.max(22,Math.round(vw*0.038));
-  woc.font=`900 ${fs}px Arial`;woc.fillStyle='rgba(255,255,255,0.35)';woc.strokeStyle='rgba(0,0,0,0.25)';woc.lineWidth=3;
-  const wt='MYFILMROOM.COM — FREE TRIAL',tw2=woc.measureText(wt).width+60,diag2=Math.sqrt(vw*vw+vh*vh);
-  for(let x=-diag2;x<diag2*2;x+=tw2)for(let y=-diag2;y<diag2*2;y+=fs*3.5){woc.strokeText(wt,x,y);woc.fillText(wt,x,y);}
-  woc.restore();oc.drawImage(wmOff,0,0,vw,vh);
+  oc.save();
+  oc.translate(vw/2,vh/2);
+  oc.rotate(-Math.PI/4);
+  oc.font=`900 ${fs}px Arial, sans-serif`;
+  oc.textAlign='center';
+  oc.textBaseline='middle';
+  const wt='MYFILMROOM.COM — FREE TRIAL';
+  const tw=oc.measureText(wt).width+80;
+  const diag=Math.sqrt(vw*vw+vh*vh);
+  for(let x=-diag;x<diag;x+=tw){
+    for(let y=-diag;y<diag;y+=fs*3.5){
+      oc.strokeStyle='rgba(0,0,0,0.5)';
+      oc.lineWidth=4;
+      oc.strokeText(wt,x,y);
+      oc.fillStyle='rgba(255,255,255,0.45)';
+      oc.fillText(wt,x,y);
+    }
+  }
+  oc.restore();
   const link=document.createElement('a');
   link.download=`filmroom-${filenameDisplay.textContent.replace(/\.[^.]+$/,'').substring(0,30)}-${fmt(video.currentTime).replace(':','m')}s.png`;
-  link.href=off.toDataURL('image/png');link.click();showToast('Frame exported as PNG');
+  link.href=off.toDataURL('image/png');
+  link.click();
+  showToast('Frame exported as PNG');
 });
 
 
