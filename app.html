@@ -249,7 +249,6 @@
   <button class="tb-btn" id="btn-open-folder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>Load Folder</button>
   <button class="tb-btn" id="btn-playlist-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>Playlist</button>
   <button class="tb-btn" id="btn-bm-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>Bookmarks</button>
-  <button class="tb-btn" id="btn-export"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export PNG</button>
   <input type="file" id="session-file-input" accept=".json" style="display:none">
   <button class="tb-btn" id="btn-record"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><circle id="rec-dot" cx="12" cy="12" r="4" fill="currentColor"/></svg>Record</button>
 
@@ -1206,26 +1205,6 @@ function loadSessionFile(file){
   };
   reader.readAsText(file);
 }
-
-document.getElementById('btn-export').addEventListener('click',()=>{
-  if(!video.src){showToast('No video loaded');return;}
-  const vw=video.videoWidth,vh=video.videoHeight;
-  const off=document.createElement('canvas');
-  off.width=vw;off.height=vh;
-  const oc=off.getContext('2d');
-  if(state.zoom>1){
-    const{sx,sy,sw,sh}=getCropRect();
-    oc.drawImage(video,sx,sy,sw,sh,0,0,vw,vh);
-    if(canvas.width&&canvas.height) oc.drawImage(canvas,sx/vw*canvas.width,sy/vh*canvas.height,sw/vw*canvas.width,sh/vh*canvas.height,0,0,vw,vh);
-  } else {
-    oc.drawImage(video,0,0,vw,vh);
-    if(canvas.width&&canvas.height) oc.drawImage(canvas,0,0,vw,vh);
-  }
-  const link=document.createElement('a');
-  link.download=`filmroom-${filenameDisplay.textContent.replace(/\.[^.]+$/,'').substring(0,30)}-${fmt(video.currentTime).replace(':','m')}s.png`;
-  link.href=off.toDataURL('image/png');link.click();showToast('Frame exported as PNG');
-});
-
 
 // ── STUDIO RECORDER ──
 // Composites video + drawings + webcam bubble + mic into one exported file.
