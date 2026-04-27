@@ -209,28 +209,41 @@
 
   <div id="content">
     <h1>My Account</h1>
-    <p class="subtitle" id="welcome-text">Manage your Film Room subscription</p>
+    <p class="subtitle">Manage your Film Room subscription</p>
 
-    <!-- Account Info -->
+    <!-- Account Info — auto-populated by Memberstack -->
     <div class="card">
       <div class="card-title">Account</div>
-      <div class="member-email" id="member-email">—</div>
-      <div id="plan-badge-wrap"></div>
+      <div class="member-email" data-ms-member="email"></div>
+      <div style="margin-top:8px;display:flex;align-items:center;gap:8px;">
+        <span style="font-size:13px;color:var(--muted);">Plan:</span>
+        <span style="font-size:13px;color:var(--text);" data-ms-member="plan:name"></span>
+      </div>
+      <div style="margin-top:6px;display:flex;align-items:center;gap:8px;">
+        <span style="font-size:13px;color:var(--muted);">Status:</span>
+        <span class="plan-badge trial" id="status-badge" data-ms-member="plan:status"></span>
+      </div>
     </div>
 
-    <!-- Actions -->
-    <div class="card" id="upgrade-card" style="display:none;">
-      <div class="card-title">Upgrade</div>
-      <p style="font-size:14px;color:var(--muted);margin-bottom:16px;line-height:1.6;">Get full access — no watermarks, all features unlocked.</p>
-      <button class="btn btn-primary" data-ms-price:add="prc_pro-monthly-7v5w0ac0">⬆ Start 7-Day Free Trial — then $9.99/month</button>
+    <!-- Unlock Full App (only shown to trialing users) -->
+    <div class="card" id="upgrade-card">
+      <div class="card-title">Unlock Full App</div>
+      <p style="font-size:14px;color:var(--muted);margin-bottom:16px;line-height:1.6;">Remove the watermark and get full access right now. Your card on file will be charged immediately.</p>
+      <button class="btn btn-primary" data-ms-price:update="prc_pro-monthly-instant-access-ii810aq6" id="upgrade-btn">
+        Unlock Full App Now — $9.99/month
+      </button>
     </div>
 
-    <div class="card" id="manage-card" style="display:none;">
-      <div class="card-title">Subscription</div>
+    <!-- Manage Billing (cancel, update card, etc.) -->
+    <div class="card">
+      <div class="card-title">Billing</div>
       <p style="font-size:14px;color:var(--muted);margin-bottom:16px;line-height:1.6;">Update your payment method, view invoices, or cancel your subscription.</p>
-      <button class="btn btn-secondary" data-ms-action="customer-portal">Manage Billing</button>
+      <button class="btn btn-secondary" data-ms-action="customer-portal">
+        Manage Billing &amp; Cancel
+      </button>
     </div>
 
+    <!-- Logout -->
     <div class="card">
       <div class="card-title">Session</div>
       <button class="btn btn-danger" data-ms-action="logout">Log Out</button>
@@ -239,33 +252,18 @@
 </main>
 
 <script>
-  function waitForMS(cb,t=0){if(window.$memberstackDom){cb();return;}if(t>80){document.getElementById('loading').textContent='Could not connect. Please refresh.';return;}setTimeout(()=>waitForMS(cb,t+1),100);}
-
+  function waitForMS(cb,t=0){if(window.$memberstackDom){cb();return;}if(t>80)return;setTimeout(()=>waitForMS(cb,t+1),100);}
   waitForMS(()=>{
     window.$memberstackDom.getCurrentMember().then(({data:member})=>{
       if(!member){window.location.href='/';return;}
-
       document.getElementById('loading').style.display='none';
       document.getElementById('content').style.display='block';
-
-      const email=member.auth?.email||'';
-      document.getElementById('member-email').textContent=email;
-      document.getElementById('welcome-text').textContent='Welcome back, '+email.split('@')[0];
-
+      // Hide upgrade button for fully active (non-trialing) subscribers
       const plans=member.planConnections||[];
+      const isActive=plans.some(p=>(p.planId==='pln_subscriber-lox03oo'||p.planId==='pln_subscriber-instant-access-ba36039h')&&p.status==='ACTIVE');
       const isTrialing=plans.some(p=>p.planId==='pln_subscriber-lox03oo'&&p.status==='TRIALING');
-      const isPaid=plans.some(p=>p.planId==='pln_subscriber-lox03oo'&&(p.status==='ACTIVE'||p.status==='TRIALING'));
-
-      const badgeWrap=document.getElementById('plan-badge-wrap');
-      if(isTrialing){
-        badgeWrap.innerHTML='<div class="plan-badge trial"><div class="dot"></div>Free Trial</div>';
-        document.getElementById('upgrade-card').style.display='block';
-      } else if(isPaid){
-        badgeWrap.innerHTML='<div class="plan-badge active"><div class="dot"></div>Pro Subscriber</div>';
-        document.getElementById('manage-card').style.display='block';
-      } else {
-        badgeWrap.innerHTML='<div class="plan-badge trial"><div class="dot"></div>Free Trial</div>';
-        document.getElementById('upgrade-card').style.display='block';
+      if(isActive&&!isTrialing){
+        document.getElementById('upgrade-card').style.display='none';
       }
     });
   });
