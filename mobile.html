@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0a0c0f">
+<title>Film Room</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c0f;
+    --surface: #13171c;
+    --border: rgba(255,255,255,0.08);
+    --gold: #e8b84b;
+    --text: #edf0f3;
+    --muted: #5a6475;
+    --red: #e05252;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --topbar-h: 52px;
+    --controls-h: 80px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--text);
+    touch-action: none;
+    overscroll-behavior: none;
+    font-family: 'Barlow Condensed', sans-serif;
+  }
+
+  /* TOPBAR */
+  #topbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: calc(var(--topbar-h) + var(--safe-top));
+    padding-top: var(--safe-top);
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding-left: 10px;
+    padding-right: 10px;
+    z-index: 100;
+    gap: 8px;
+  }
+  .logo {
+    font-size: 16px; font-weight: 900;
+    letter-spacing: .08em; text-transform: uppercase;
+    color: var(--gold); flex: 1;
+  }
+  .logo span { color: rgba(237,240,243,0.4); font-weight: 400; }
+  .top-btn {
+    width: 40px; height: 40px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; flex-shrink: 0;
+  }
+  .top-btn svg { width: 18px; height: 18px; }
+  .top-btn.active { background: rgba(224,82,82,0.2); border-color: rgba(224,82,82,0.5); }
+  .top-btn.active svg { stroke: var(--red); }
+  .top-btn.draw-on { background: rgba(232,184,75,0.15); border-color: rgba(232,184,75,0.4); }
+  .top-btn.draw-on svg { stroke: var(--gold); }
+
+  /* VIDEO AREA */
+  #video-area {
+    position: fixed;
+    top: calc(var(--topbar-h) + var(--safe-top));
+    left: 0; right: 0;
+    bottom: calc(var(--controls-h) + var(--safe-bottom));
+    background: #000;
+  }
+  #video {
+    width: 100%; height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+  #draw-canvas {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    touch-action: none;
+  }
+  #draw-canvas.active { pointer-events: all; }
+
+  /* Progress bar */
+  #progress-wrap {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 4px;
+    background: rgba(255,255,255,0.08);
+    touch-action: none;
+    z-index: 10;
+  }
+  #progress-fill { height: 100%; background: var(--gold); width: 0%; pointer-events: none; }
+
+  /* Drop zone */
+  #drop-zone {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 14px;
+  }
+  #drop-zone.hidden { display: none; }
+  .dz-icon {
+    width: 64px; height: 64px;
+    border: 2px dashed rgba(232,184,75,0.35);
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .dz-icon svg { width: 28px; height: 28px; stroke: var(--gold); opacity: 0.6; fill: none; stroke-width: 1.5; }
+  .dz-title { font-size: 24px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+  .dz-sub { font-size: 13px; color: var(--muted); text-align: center; padding: 0 40px; line-height: 1.5; }
+  .dz-btn {
+    padding: 14px 36px;
+    background: var(--gold); color: #0a0c0f;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 15px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+    border: none; border-radius: 8px; cursor: pointer; margin-top: 6px;
+  }
+
+  /* CONTROLS */
+  #controls {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: calc(var(--controls-h) + var(--safe-bottom));
+    padding-bottom: var(--safe-bottom);
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding-left: 8px; padding-right: 8px;
+    gap: 5px;
+  }
+  .ctrl {
+    flex: 1;
+    height: 58px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 3px;
+    cursor: pointer;
+    -webkit-user-select: none; user-select: none;
+  }
+  .ctrl:active { background: rgba(255,255,255,0.09); }
+  .ctrl svg { width: 22px; height: 22px; fill: var(--muted); }
+  .ctrl .lbl { font-size: 9px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
+  #btn-play {
+    flex: 1.5;
+    background: rgba(232,184,75,0.1);
+    border-color: rgba(232,184,75,0.3);
+  }
+  #btn-play svg { fill: var(--gold); width: 28px; height: 28px; }
+  #btn-play .lbl { color: var(--gold); }
+  #btn-play:active { background: rgba(232,184,75,0.2); }
+  #time-display {
+    font-size: 10px; color: var(--muted); line-height: 1.4;
+    text-align: center; flex-shrink: 0; min-width: 40px;
+  }
+
+  /* Webcam bubble */
+  #webcam-bubble {
+    position: fixed;
+    top: calc(var(--topbar-h) + var(--safe-top) + 10px);
+    right: 10px;
+    width: 90px; height: 90px;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 2px solid var(--gold);
+    background: #000;
+    display: none; z-index: 50;
+  }
+  #webcam-video { width: 100%; height: 100%; object-fit: cover; }
+
+  /* Toast */
+  #toast {
+    position: fixed;
+    bottom: calc(var(--controls-h) + var(--safe-bottom) + 14px);
+    left: 50%; transform: translateX(-50%);
+    background: rgba(30,38,47,0.95);
+    color: var(--text);
+    font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+    padding: 8px 18px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    opacity: 0; transition: opacity 0.2s;
+    pointer-events: none; white-space: nowrap;
+    z-index: 200;
+  }
+  #toast.show { opacity: 1; }
+
+  #file-input { display: none; }
+</style>
+</head>
+<body>
+
+<input type="file" id="file-input" accept="video/*">
+
+<!-- TOPBAR -->
+<div id="topbar">
+  <!-- Left: Record + Webcam -->
+  <button class="top-btn" id="btn-record" title="Record">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="8"/>
+      <circle cx="12" cy="12" r="3.5" fill="currentColor" stroke="none"/>
+    </svg>
+  </button>
+  <button class="top-btn" id="btn-webcam" title="Webcam">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <rect x="2" y="7" width="15" height="10" rx="2"/>
+      <polygon points="22 7 17 10.5 17 13.5 22 17"/>
+    </svg>
+  </button>
+
+  <div class="logo">Film <span>Room</span></div>
+
+  <!-- Right: Open + Draw + Clear -->
+  <button class="top-btn" id="btn-open" title="Open Video">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+    </svg>
+  </button>
+  <button class="top-btn" id="btn-draw" title="Draw mode">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M12 19l7-7 3 3-7 7-3-3z"/>
+      <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/>
+    </svg>
+  </button>
+  <button class="top-btn" id="btn-clear" title="Clear">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M20 20H7L3 16l11-11 6 6-2 2-6-6"/>
+      <line x1="6" y1="20" x2="20" y2="20"/>
+    </svg>
+  </button>
+</div>
+
+<!-- VIDEO AREA -->
+<div id="video-area">
+  <video id="video" playsinline webkit-playsinline preload="metadata"></video>
+  <canvas id="draw-canvas"></canvas>
+  <div id="progress-wrap"><div id="progress-fill"></div></div>
+  <div id="drop-zone">
+    <div class="dz-icon">
+      <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="3"/><polygon points="10 8 16 12 10 16"/></svg>
+    </div>
+    <div class="dz-title">Film Room</div>
+    <div class="dz-sub">Open a video from your files or Photos app to start your breakdown</div>
+    <button class="dz-btn" id="dz-open">Open Video</button>
+  </div>
+</div>
+
+<!-- WEBCAM BUBBLE -->
+<div id="webcam-bubble">
+  <video id="webcam-video" autoplay muted playsinline></video>
+</div>
+
+<!-- CONTROLS -->
+<div id="controls">
+  <button class="ctrl" id="btn-rev-fast">
+    <svg viewBox="0 0 24 24"><polygon points="19 20 9 12 19 4"/><line x1="5" y1="19" x2="5" y2="5" stroke="currentColor" stroke-width="2.5" fill="none"/></svg>
+    <span class="lbl">2× Rev</span>
+  </button>
+  <button class="ctrl" id="btn-rev-slow">
+    <svg viewBox="0 0 24 24"><polygon points="15 20 5 12 15 4"/><polygon points="22 20 12 12 22 4" opacity="0.4"/></svg>
+    <span class="lbl">½ Rev</span>
+  </button>
+  <button class="ctrl" id="btn-play">
+    <svg id="ico-play" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21"/></svg>
+    <svg id="ico-pause" viewBox="0 0 24 24" style="display:none"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+    <span class="lbl" id="play-lbl">Play</span>
+  </button>
+  <button class="ctrl" id="btn-fwd-slow">
+    <svg viewBox="0 0 24 24"><polygon points="9 20 19 12 9 4"/><polygon points="2 20 12 12 2 4" opacity="0.4"/></svg>
+    <span class="lbl">½ Fwd</span>
+  </button>
+  <button class="ctrl" id="btn-fwd-fast">
+    <svg viewBox="0 0 24 24"><polygon points="5 4 15 12 5 20"/><line x1="19" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2.5" fill="none"/></svg>
+    <span class="lbl">2× Fwd</span>
+  </button>
+  <div id="time-display">0:00<br>/0:00</div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const video = document.getElementById('video');
+const canvas = document.getElementById('draw-canvas');
+const ctx = canvas.getContext('2d');
+const dropZone = document.getElementById('drop-zone');
+const progressFill = document.getElementById('progress-fill');
+const timeDisplay = document.getElementById('time-display');
+
+let drawMode = false, isDrawing = false;
+let lastX = 0, lastY = 0;
+let recordingActive = false, mediaRecorder = null, recordChunks = [];
+let webcamStream = null, speedInterval = null, toastTimer = null;
+
+// Helpers
+function fmt(s) {
+  if(isNaN(s)||s<0)return'0:00';
+  const m=Math.floor(s/60),sec=Math.floor(s%60);
+  return `${m}:${sec.toString().padStart(2,'0')}`;
+}
+function toast(msg) {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),1800);
+}
+function resizeCanvas() {
+  canvas.width=canvas.offsetWidth;
+  canvas.height=canvas.offsetHeight;
+}
+
+// File open
+document.getElementById('file-input').addEventListener('change',e=>{
+  if(e.target.files[0])loadFile(e.target.files[0]);
+});
+document.getElementById('dz-open').addEventListener('click',()=>document.getElementById('file-input').click());
+document.getElementById('btn-open').addEventListener('click',()=>document.getElementById('file-input').click());
+
+function loadFile(file){
+  video.src=URL.createObjectURL(file);
+  video.load(); video.muted=false;
+  dropZone.classList.add('hidden');
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  toast(file.name.substring(0,22));
+}
+
+// Video events
+video.addEventListener('loadedmetadata',()=>setTimeout(resizeCanvas,100));
+video.addEventListener('timeupdate',()=>{
+  if(video.duration){
+    progressFill.style.width=(video.currentTime/video.duration*100)+'%';
+    timeDisplay.innerHTML=fmt(video.currentTime)+'<br>/'+fmt(video.duration);
+  }
+});
+video.addEventListener('play',()=>{
+  document.getElementById('ico-play').style.display='none';
+  document.getElementById('ico-pause').style.display='';
+  document.getElementById('play-lbl').textContent='Pause';
+});
+video.addEventListener('pause',()=>{
+  document.getElementById('ico-play').style.display='';
+  document.getElementById('ico-pause').style.display='none';
+  document.getElementById('play-lbl').textContent='Play';
+});
+window.addEventListener('resize',resizeCanvas);
+resizeCanvas();
+
+// Progress scrub
+const pw=document.getElementById('progress-wrap');
+function scrubAt(touch){
+  if(!video.duration)return;
+  const r=pw.getBoundingClientRect();
+  video.currentTime=Math.max(0,Math.min(1,(touch.clientX-r.left)/r.width))*video.duration;
+}
+pw.addEventListener('touchstart',e=>{e.stopPropagation();scrubAt(e.touches[0]);},{passive:true});
+pw.addEventListener('touchmove',e=>{e.stopPropagation();scrubAt(e.touches[0]);},{passive:true});
+
+// Play/Pause
+document.getElementById('btn-play').addEventListener('click',()=>{
+  if(!video.src)return;
+  video.paused?video.play():video.pause();
+});
+
+// Speed buttons (hold to scrub)
+function makeSpeedBtn(id,speed){
+  const btn=document.getElementById(id);
+  btn.addEventListener('touchstart',e=>{
+    e.preventDefault();
+    if(!video.src)return;
+    video.pause();
+    if(speed<0){
+      video.playbackRate=1;
+      speedInterval=setInterval(()=>{
+        video.currentTime=Math.max(0,video.currentTime-Math.abs(speed)*0.06);
+      },50);
+    } else {
+      video.playbackRate=speed;
+      video.play();
+    }
+  },{passive:false});
+  btn.addEventListener('touchend',e=>{
+    e.preventDefault();
+    clearInterval(speedInterval);
+    video.pause();
+    video.playbackRate=1;
+  },{passive:false});
+  btn.addEventListener('touchcancel',e=>{
+    e.preventDefault();
+    clearInterval(speedInterval);
+    video.pause();
+    video.playbackRate=1;
+  },{passive:false});
+}
+makeSpeedBtn('btn-rev-fast',-2);
+makeSpeedBtn('btn-rev-slow',-0.5);
+makeSpeedBtn('btn-fwd-slow',0.5);
+makeSpeedBtn('btn-fwd-fast',2);
+
+// Draw mode
+document.getElementById('btn-draw').addEventListener('click',()=>{
+  drawMode=!drawMode;
+  canvas.classList.toggle('active',drawMode);
+  document.getElementById('btn-draw').classList.toggle('draw-on',drawMode);
+  toast(drawMode?'Draw ON':'Draw OFF');
+});
+document.getElementById('btn-clear').addEventListener('click',()=>{
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  toast('Cleared');
+});
+
+// Touch drawing
+canvas.addEventListener('touchstart',e=>{
+  if(!drawMode)return;
+  e.preventDefault();
+  const t=e.touches[0],r=canvas.getBoundingClientRect();
+  lastX=t.clientX-r.left; lastY=t.clientY-r.top;
+  isDrawing=true;
+  ctx.beginPath(); ctx.moveTo(lastX,lastY);
+},{passive:false});
+canvas.addEventListener('touchmove',e=>{
+  if(!drawMode||!isDrawing)return;
+  e.preventDefault();
+  const t=e.touches[0],r=canvas.getBoundingClientRect();
+  const x=t.clientX-r.left,y=t.clientY-r.top;
+  ctx.strokeStyle='#f5e642';
+  ctx.lineWidth=5; ctx.lineCap='round'; ctx.lineJoin='round';
+  ctx.lineTo(x,y); ctx.stroke();
+  lastX=x; lastY=y;
+},{passive:false});
+canvas.addEventListener('touchend',()=>isDrawing=false);
+
+// Webcam
+document.getElementById('btn-webcam').addEventListener('click',async()=>{
+  const bubble=document.getElementById('webcam-bubble');
+  const btn=document.getElementById('btn-webcam');
+  if(webcamStream){
+    webcamStream.getTracks().forEach(t=>t.stop());
+    webcamStream=null;
+    bubble.style.display='none';
+    btn.classList.remove('active');
+    toast('Webcam off');
+  } else {
+    try {
+      webcamStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'},audio:false});
+      document.getElementById('webcam-video').srcObject=webcamStream;
+      bubble.style.display='block';
+      btn.classList.add('active');
+      toast('Webcam on');
+    } catch { toast('Camera unavailable'); }
+  }
+});
+
+// Record
+document.getElementById('btn-record').addEventListener('click',async()=>{
+  const btn=document.getElementById('btn-record');
+  if(recordingActive){
+    mediaRecorder.stop();
+    recordingActive=false;
+    btn.classList.remove('active');
+    toast('Saving…');
+  } else {
+    try {
+      const off=document.createElement('canvas');
+      off.width=video.videoWidth||640; off.height=video.videoHeight||360;
+      const oc=off.getContext('2d');
+      const stream=off.captureStream(30);
+      let micStream=null;
+      try { micStream=await navigator.mediaDevices.getUserMedia({audio:true}); } catch{}
+      const tracks=[...stream.getTracks()];
+      if(micStream)micStream.getAudioTracks().forEach(t=>tracks.push(t));
+      const combined=new MediaStream(tracks);
+      mediaRecorder=new MediaRecorder(combined,{mimeType:'video/webm'});
+      recordChunks=[];
+      mediaRecorder.ondataavailable=e=>{if(e.data.size>0)recordChunks.push(e.data);};
+      mediaRecorder.onstop=()=>{
+        const blob=new Blob(recordChunks,{type:'video/webm'});
+        const a=document.createElement('a');
+        a.href=URL.createObjectURL(blob); a.download='filmroom.webm'; a.click();
+        if(micStream)micStream.getTracks().forEach(t=>t.stop());
+        toast('Saved!');
+      };
+      mediaRecorder.start(100);
+      recordingActive=true;
+      btn.classList.add('active');
+      toast('Recording…');
+      (function draw(){
+        if(!recordingActive)return;
+        oc.drawImage(video,0,0,off.width,off.height);
+        oc.drawImage(canvas,0,0,off.width,off.height);
+        requestAnimationFrame(draw);
+      })();
+    } catch { toast('Recording not supported'); }
+  }
+});
+</script>
+</body>
+</html>

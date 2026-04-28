@@ -174,14 +174,15 @@
   #settings-panel{display:none;position:fixed;inset:0;z-index:200;}
   #settings-panel.open{display:block;}
   #settings-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(3px);}
-  #settings-box{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:500px;max-width:95vw;background:#161c23;border:1px solid rgba(255,255,255,0.1);border-radius:10px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,0.7);}
+  #settings-box{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:860px;max-width:95vw;background:#161c23;border:1px solid rgba(255,255,255,0.1);border-radius:10px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,0.7);}
   #settings-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid rgba(255,255,255,0.07);font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#e8b84b;}
   #settings-close{background:none;border:none;color:#6b7280;cursor:pointer;font-size:16px;padding:4px 8px;border-radius:4px;transition:color .15s;}
   #settings-close:hover{color:#e8eaed;}
   #settings-body{padding:16px 20px;}
-  #keys-table{width:100%;border-collapse:collapse;}
-  #keys-table th{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#6b7280;padding:6px 8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.06);}
-  #keys-table td{padding:6px 8px;border-bottom:1px solid rgba(255,255,255,0.04);}
+  #keys-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 32px;}
+  #keys-grid .keys-col table{width:100%;border-collapse:collapse;}
+  #keys-grid .keys-col table td{padding:6px 8px;border-bottom:1px solid rgba(255,255,255,0.04);}
+  .key-group-header td{padding:10px 8px 4px!important;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);border-bottom:1px solid var(--border)!important;border-top:none!important;}
   .key-action-label{font-size:13px;color:#e8eaed;}
   .key-hint{font-size:11px;color:#6b7280;font-family:'Barlow Condensed',sans-serif;letter-spacing:.04em;}
   .key-chip{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;background:#1e262f;border:1px solid rgba(255,255,255,0.12);border-bottom:3px solid rgba(255,255,255,0.07);border-radius:5px;padding:4px 10px;color:#e8b84b;cursor:pointer;min-width:64px;text-align:center;transition:all .15s;}
@@ -786,26 +787,26 @@ document.addEventListener('keyup',e=>{
 let settingsOpen=false;
 
 const ACTIONS_META=[
-  {id:'rev4x',   label:'4× Reverse',        hint:'Hold key'},
-  {id:'rev2x',   label:'2× Reverse',         hint:'Hold key'},
-  {id:'revHalf', label:'½ Speed Reverse',    hint:'Hold key'},
-  {id:'fwdHalf', label:'½ Speed Forward',    hint:'Hold key'},
-  {id:'fwd2x',   label:'2× Fast Forward',    hint:'Hold key'},
-  {id:'play',    label:'Play / Pause',        hint:'Tap key'},
-  {id:'pen',     label:'Toggle Pen/Eraser',   hint:'Tap key'},
-  {id:'circle',  label:'Circle (yellow)',      hint:'Tap key'},
-  {id:'triangle',label:'Triangle (green)',     hint:'Tap key'},
-  {id:'clear',   label:'Clear Drawings',      hint:'Tap key'},
-  {id:'undo',    label:'Undo Last Stroke',     hint:'Tap key'},
-  {id:'fade',    label:'Toggle Fade Timer',    hint:'Tap key'},
-  {id:'clipIn',  label:'Set Clip In Point',    hint:'Tap key'},
-  {id:'clipOut', label:'Set Clip Out Point',   hint:'Tap key'},
-  {id:'clipLoop',label:'Toggle Loop',          hint:'Tap key'},
-  {id:'clipClear',label:'Clear Clip Markers',  hint:'Tap key'},
-  {id:'skipBack',label:'Skip Back 5s',        hint:'Tap key'},
-  {id:'skipFwd', label:'Skip Forward 5s',     hint:'Tap key'},
-  {id:'record',  label:'Start/Stop Recording',hint:'Tap key'},
-  {id:'webcam',  label:'Toggle Webcam',       hint:'Tap key'},
+  {id:'rev4x',    label:'4× Reverse',          hint:'Hold key', group:'Playback'},
+  {id:'rev2x',    label:'2× Reverse',           hint:'Hold key', group:'Playback'},
+  {id:'revHalf',  label:'½ Speed Reverse',      hint:'Hold key', group:'Playback'},
+  {id:'play',     label:'Play / Pause',          hint:'Tap key',  group:'Playback'},
+  {id:'fwdHalf',  label:'½ Speed Forward',      hint:'Hold key', group:'Playback'},
+  {id:'fwd2x',    label:'2× Fast Forward',      hint:'Hold key', group:'Playback'},
+  {id:'skipBack', label:'Skip Back 5s',          hint:'Tap key',  group:'Playback'},
+  {id:'skipFwd',  label:'Skip Forward 5s',       hint:'Tap key',  group:'Playback'},
+  {id:'pen',      label:'Toggle Pen/Eraser',     hint:'Tap key',  group:'Telestration'},
+  {id:'circle',   label:'Circle (yellow)',        hint:'Tap key',  group:'Telestration'},
+  {id:'triangle', label:'Triangle (green)',       hint:'Tap key',  group:'Telestration'},
+  {id:'clear',    label:'Clear Drawings',         hint:'Tap key',  group:'Telestration'},
+  {id:'undo',     label:'Undo Last Stroke',       hint:'Tap key',  group:'Telestration'},
+  {id:'fade',     label:'Toggle Fade Timer',      hint:'Tap key',  group:'Telestration'},
+  {id:'clipIn',   label:'Set Clip In Point',      hint:'Tap key',  group:'Looping'},
+  {id:'clipOut',  label:'Set Clip Out Point',     hint:'Tap key',  group:'Looping'},
+  {id:'clipLoop', label:'Toggle Loop',            hint:'Tap key',  group:'Looping'},
+  {id:'clipClear',label:'Clear Clip Markers',     hint:'Tap key',  group:'Looping'},
+  {id:'record',   label:'Start/Stop Recording',   hint:'Tap key',  group:'Recording'},
+  {id:'webcam',   label:'Toggle Webcam',          hint:'Tap key',  group:'Recording'},
 ];
 
 // Inject settings button into topbar
@@ -826,10 +827,10 @@ settingsPanel.innerHTML=`
       <button id="settings-close">✕</button>
     </div>
     <div id="settings-body">
-      <table id="keys-table">
-        <thead><tr><th>Action</th><th>Type</th><th>Key</th></tr></thead>
-        <tbody id="keys-tbody"></tbody>
-      </table>
+      <div id="keys-grid">
+        <div class="keys-col"><table id="keys-table-left"><tbody id="keys-tbody-left"></tbody></table></div>
+        <div class="keys-col"><table id="keys-table-right"><tbody id="keys-tbody-right"></tbody></table></div>
+      </div>
       <div id="settings-footer">
         <span id="binding-status"></span>
         <button id="btn-reset-keys">Reset to Defaults</button>
@@ -847,20 +848,31 @@ function keyLabel(k){
 let bindingAction=null;
 
 function renderKeysTable(){
-  const tbody=document.getElementById('keys-tbody');
-  tbody.innerHTML='';
-  ACTIONS_META.forEach(a=>{
-    const tr=document.createElement('tr');
-    tr.dataset.action=a.id;
-    tr.className=bindingAction===a.id?'binding':'';
-    tr.innerHTML=`
-      <td class="key-action-label">${a.label}</td>
-      <td class="key-hint">${a.hint}</td>
-      <td><button class="key-chip${bindingAction===a.id?' listening':''}" data-action="${a.id}">${bindingAction===a.id?'Press a key…':keyLabel(keys[a.id])}</button></td>`;
-    tbody.appendChild(tr);
-  });
-  // Re-attach click listeners
-  tbody.querySelectorAll('.key-chip').forEach(btn=>{
+  const leftGroups=['Playback','Telestration'];
+  const rightGroups=['Looping','Recording'];
+  function buildCol(tbodyId,groups){
+    const tbody=document.getElementById(tbodyId);
+    if(!tbody)return;
+    tbody.innerHTML='';
+    let currentGroup='';
+    ACTIONS_META.filter(a=>groups.includes(a.group)).forEach(a=>{
+      if(a.group!==currentGroup){
+        currentGroup=a.group;
+        const tr=document.createElement('tr');
+        tr.className='key-group-header';
+        tr.innerHTML=`<td colspan="3">${currentGroup}</td>`;
+        tbody.appendChild(tr);
+      }
+      const tr=document.createElement('tr');
+      tr.dataset.action=a.id;
+      tr.className=bindingAction===a.id?'binding':'';
+      tr.innerHTML=`<td class="key-action-label">${a.label}</td><td class="key-hint">${a.hint}</td><td><button class="key-chip${bindingAction===a.id?' listening':''}" data-action="${a.id}">${bindingAction===a.id?'Press a key…':keyLabel(keys[a.id])}</button></td>`;
+      tbody.appendChild(tr);
+    });
+  }
+  buildCol('keys-tbody-left',leftGroups);
+  buildCol('keys-tbody-right',rightGroups);
+  document.querySelectorAll('.key-chip').forEach(btn=>{
     btn.addEventListener('click',()=>{
       bindingAction=btn.dataset.action;
       renderKeysTable();
