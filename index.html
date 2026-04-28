@@ -657,40 +657,51 @@
 
   <!-- Mock app UI -->
   <div class="app-frame reveal">
+    <!-- Topbar matching real app exactly -->
     <div class="app-chrome">
-      <div class="chrome-logo">&#9633; Film<span>Room</span></div>
+      <div class="chrome-logo">&#9633; FILM<span>ROOM</span></div>
       <div class="chrome-btn">Open File</div>
+      <div class="chrome-btn">Load Folder</div>
+      <div class="chrome-btn">Playlist</div>
       <div class="chrome-btn">Bookmarks</div>
       <div class="chrome-btn">Record</div>
+      <div class="chrome-btn">Webcam</div>
+      <div class="chrome-btn">Keys</div>
       <div class="chrome-spacer"></div>
-      <div class="chrome-rec-label"><div class="chrome-rec"></div>REC</div>
+      <div class="chrome-btn" style="color:#e8b84b;border-color:rgba(232,184,75,0.3);">⬆ Upgrade to Pro</div>
+      <div class="chrome-btn">Account</div>
     </div>
     <div class="app-body">
-      <!-- Toolbar -->
+      <!-- Left toolbar matching real app -->
       <div class="app-toolbar">
-        <div class="tb-icon active">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/></svg>
-        </div>
+        <div class="tb-icon active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/></svg></div>
         <div class="tb-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
         <div class="tb-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="19" x2="19" y2="5"/></svg></div>
         <div class="tb-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="12" rx="10" ry="6"/></svg></div>
         <div class="tb-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="1"/></svg></div>
-        <div class="tb-dot yellow"></div>
+        <div class="tb-icon" style="border:1.5px solid rgba(245,230,66,0.4);"><svg viewBox="0 0 24 24" fill="none" stroke="#f5e642" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg></div>
+        <div class="tb-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#3ddc84" stroke-width="2"><polygon points="12 5 2 19 22 19"/></svg></div>
+        <div class="tb-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 20H7L3 16l11-11 6 6-2 2"/></svg></div>
+        <div class="tb-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></div>
+        <div class="tb-dot yellow" style="margin-top:4px;"></div>
       </div>
-      <!-- Real app screenshot -->
-      <div class="app-video" style="background:#000;padding:0;overflow:hidden;">
+      <!-- Real screenshot -->
+      <div class="app-video">
         <img src="screenshot.png" alt="Film Room in action" style="width:100%;height:100%;object-fit:cover;display:block;"/>
       </div>
     </div>
+    <!-- Controls bar matching real app -->
     <div class="app-controls">
-      <div class="ctrl-circle"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="19 20 9 12 19 4 19 20"/></svg></div>
-      <div class="ctrl-circle"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="15 20 5 12 15 4 15 20"/><polygon points="22 20 12 12 22 4 22 20" opacity="0.4"/></svg></div>
-      <div class="ctrl-circle accent"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg></div>
-      <div class="ctrl-circle"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="9 20 19 12 9 4 9 20"/></svg></div>
-      <div class="ctrl-circle"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 4 15 12 5 20 5 4"/></svg></div>
-      <div style="width:1px;height:20px;background:rgba(255,255,255,0.06);"></div>
+      <div class="ctrl-circle"><svg viewBox="0 0 24 24" fill="currentColor" width="12" height="12"><polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5" stroke="currentColor" stroke-width="2.5"/></svg></div>
+      <div class="ctrl-circle"><svg viewBox="0 0 24 24" fill="currentColor" width="12" height="12"><polygon points="15 20 5 12 15 4 15 20"/><polygon points="22 20 12 12 22 4 22 20" opacity="0.4"/></svg></div>
+      <div class="ctrl-circle"><svg viewBox="0 0 24 24" fill="currentColor" width="12" height="12"><polygon points="15 20 5 12 15 4 15 20"/></svg></div>
+      <div class="ctrl-circle accent"><svg viewBox="0 0 24 24" fill="currentColor" width="12" height="12"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg></div>
+      <div class="ctrl-circle"><svg viewBox="0 0 24 24" fill="currentColor" width="12" height="12"><polygon points="9 20 19 12 9 4 9 20"/></svg></div>
+      <div class="ctrl-circle"><svg viewBox="0 0 24 24" fill="currentColor" width="12" height="12"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2.5"/></svg></div>
+      <div style="width:1px;height:20px;background:rgba(255,255,255,0.06);margin:0 4px;"></div>
       <div class="ctrl-bar"><div class="ctrl-bar-fill"></div><div class="ctrl-bar-thumb"></div></div>
-      <div class="ctrl-time">2:14 / 6:38</div>
+      <div class="ctrl-time">16:01 / 48:34</div>
+      <div style="width:1px;height:20px;background:rgba(255,255,255,0.06);margin:0 4px;"></div>
       <div class="speed-chip">1x</div>
     </div>
   </div>
