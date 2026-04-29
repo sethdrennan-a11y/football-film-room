@@ -198,6 +198,12 @@
   .tippy.show{opacity:1;}
   .tippy kbd{background:rgba(232,184,75,0.15);border:1px solid rgba(232,184,75,0.3);border-radius:3px;padding:1px 5px;font-size:11px;color:#e8b84b;font-family:monospace;margin-left:5px;}
 </style>
+<script>
+  // Redirect mobile users immediately — no need to wait for Memberstack
+  if(/iPhone|iPad|Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
+    window.location.replace('/mobile.html');
+  }
+</script>
 <script data-memberstack-app="app_cmog066pl001u0suadgpg795a" src="https://static.memberstack.com/scripts/v1/memberstack.js" type="text/javascript"></script>
 <script>
   function waitForMS(cb,t=0){if(window.$memberstackDom){cb();return;}if(t>80)return;setTimeout(()=>waitForMS(cb,t+1),100);}
@@ -206,13 +212,9 @@
       if(!member){window.location.href='/trial.html';return;}
       const isPaid=(member.planConnections||[]).some(p=>p.status==='ACTIVE');
       if(!isPaid){window.location.href='/trial.html';return;}
-      // Paid users on mobile → mobile.html
-      if(/iPhone|Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
-        window.location.replace('/mobile.html');
-      }
     });
   });
-    });
+</script>
   });
 </script>
 </head>
@@ -690,7 +692,7 @@ const DEFAULT_KEYS={
   'rev4x':'q','rev2x':'a','revHalf':'s','fwdHalf':'d','fwd2x':'f',
   'play':' ','pen':'r','circle':'e','triangle':'w','clear':'t',
   'skipBack':'arrowleft','skipFwd':'arrowright','record':'5','webcam':'6',
-  'undo':'ctrl+z','fade':'y','clipIn':'i','clipOut':'o','clipLoop':'p','clipClear':'shift+i'
+  'undo':'ctrl+z','fade':'y','clipIn':'i','clipOut':'o','clipLoop':'p','clipClear':'shift+i','bookmark':'b'
 };
 const DANGEROUS=['f5','f11','f12','ctrl+w','ctrl+r','ctrl+t','ctrl+n','alt+f4','ctrl+shift+i','ctrl+shift+j'];
 let keys=Object.assign({},DEFAULT_KEYS);
@@ -721,6 +723,7 @@ function dispatchAction(action){
     case'undo': undoLastStroke();break;
     case'fade': toggleFade();break;
     case'clipIn': setClipIn();break;
+    case'bookmark': addBookmark();break;
     case'clipOut': setClipOut();break;
     case'clipLoop': toggleLoop();break;
     case'clipClear': clearClipMarkers();break;
