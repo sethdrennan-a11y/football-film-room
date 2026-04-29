@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- lab v5 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -147,6 +148,7 @@
   #scout-table td.time-cell:hover{background:rgba(232,184,75,0.1);}
   #scout-table td input.cell-input{background:transparent;border:none;outline:none;color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:12px;padding:4px 8px;width:100%;}
   #scout-table td input.cell-input:focus{background:rgba(255,255,255,0.04);}
+  #scout-table tr.selected-row td{background:rgba(224,82,82,0.07)!important;}
   #scout-table tr.filtered-out{display:none;}
   #scout-table tr:hover td{background:rgba(255,255,255,0.02);}
   .add-col-th{background:var(--surface2)!important;text-align:center!important;width:30px;min-width:30px;}
@@ -666,55 +668,6 @@ playerWrap.addEventListener('wheel',e=>{
   }
 },{passive:false});
 
-// ── SAVE / LOAD SESSION ──
-document.getElementById('btn-save-session').addEventListener('click',saveSession);
-document.getElementById('btn-load-session').addEventListener('click',()=>document.getElementById('session-file-input').click());
-document.getElementById('session-file-input').addEventListener('change',e=>{if(e.target.files[0])loadSession(e.target.files[0]);});
-
-function saveSession(){
-  const session={
-    version:1,
-    video:filenameDisplay.textContent,
-    savedAt:new Date().toISOString(),
-    bookmarks:state.bookmarks,
-    strokes:state.strokes,
-    clipIn:state.clipIn,
-    clipOut:state.clipOut
-  };
-  const blob=new Blob([JSON.stringify(session,null,2)],{type:'application/json'});
-  const url=URL.createObjectURL(blob);
-  const link=document.createElement('a');
-  const name=(filenameDisplay.textContent.replace(/\.[^.]+$/,'').substring(0,30)||'session');
-  link.download=`filmroom-${name}.json`;
-  link.href=url;link.click();
-  setTimeout(()=>URL.revokeObjectURL(url),3000);
-  showToast('Session saved');
-}
-
-function loadSession(file){
-  const reader=new FileReader();
-  reader.onload=e=>{
-    try{
-      const s=JSON.parse(e.target.result);
-      // Warn if video mismatch
-      if(s.video&&s.video!==filenameDisplay.textContent&&filenameDisplay.textContent!=='No file loaded'){
-        if(!confirm(`This session was saved with:\n"${s.video}"\n\nYou have loaded:\n"${filenameDisplay.textContent}"\n\nLoad anyway?`))return;
-      }
-      state.bookmarks=s.bookmarks||[];
-      state.strokes=s.strokes||[];
-      state.clipIn=s.clipIn??null;
-      state.clipOut=s.clipOut??null;
-      state.loopEnabled=false;
-      loopBadge.classList.remove('active');
-      redrawStrokes();
-      renderBookmarks();
-      updateClipMarkers();
-      showToast('Session loaded');
-    }catch{showToast('Invalid session file');}
-  };
-  reader.readAsText(file);
-}
-
 function updateSpeedDisplay(label,ns){speedDisplay.textContent=label;speedDisplay.className='speed-badge'+(ns?' nonstandard':'');}
 function setSpeed(s){stopReverse();video.playbackRate=s;video.play();updateSpeedDisplay(s+'x',s!==1);}
 function stopReverse(){state.reversing=false;if(state._seekedCleanup){state._seekedCleanup();state._seekedCleanup=null;}}
@@ -746,7 +699,7 @@ const DEFAULT_KEYS={
   'rev4x':'q','rev2x':'a','revHalf':'s','fwdHalf':'d','fwd2x':'f',
   'play':' ','pen':'r','circle':'e','triangle':'w','clear':'t',
   'skipBack':'arrowleft','skipFwd':'arrowright','record':'5','webcam':'6',
-  'undo':'ctrl+z','fade':'y','clipIn':'i','clipOut':'o','clipLoop':'p','clipClear':'shift+i'
+  'undo':'ctrl+z','fade':'y','clipIn':'i','clipOut':'o','clipLoop':'p','clipClear':'shift+i','bookmark':'b'
 };
 const DANGEROUS=['f5','f11','f12','ctrl+w','ctrl+r','ctrl+t','ctrl+n','alt+f4','ctrl+shift+i','ctrl+shift+j'];
 let keys=Object.assign({},DEFAULT_KEYS);
@@ -777,6 +730,7 @@ function dispatchAction(action){
     case'undo': undoLastStroke();break;
     case'fade': toggleFade();break;
     case'clipIn': setClipIn();break;
+    case'bookmark': addBookmark();break;
     case'clipOut': setClipOut();break;
     case'clipLoop': toggleLoop();break;
     case'clipClear': clearClipMarkers();break;
@@ -790,7 +744,8 @@ function dispatchAction(action){
 const HOLD_ACTIONS=new Set(['rev4x','rev2x','revHalf','fwdHalf','fwd2x']);
 
 document.addEventListener('keydown',e=>{
-  if(e.target===bmNoteInput||settingsOpen)return;
+  const tag=e.target.tagName;
+  if(tag==='INPUT'||tag==='TEXTAREA'||e.target.isContentEditable||settingsOpen)return;
   const key=e.key.toLowerCase();
   const action=getAction(key,e.ctrlKey,e.altKey,e.shiftKey);
   if(!action)return;
@@ -838,6 +793,7 @@ const ACTIONS_META=[
   {id:'clipClear',label:'Clear Clip Markers',     hint:'Tap key',  group:'Looping'},
   {id:'record',   label:'Start/Stop Recording',   hint:'Tap key',  group:'Recording'},
   {id:'webcam',   label:'Toggle Webcam',          hint:'Tap key',  group:'Recording'},
+  {id:'bookmark', label:'Add Bookmark',            hint:'Tap key',  group:'Bookmarks'},
 ];
 
 // Inject settings button into topbar
@@ -866,6 +822,7 @@ scoutPanel.innerHTML=`
   <div id="scout-resize-handle" title="Drag to resize"></div>
   <div id="scout-header">
     <span class="scout-title">⚑ Scouting Table</span>
+    <button class="scout-hdr-btn" id="scout-delete-selected" disabled style="color:var(--red);border-color:rgba(224,82,82,0.3);">Delete Selected</button>
     <button class="scout-hdr-btn" id="scout-export">Export CSV</button>
     <button class="scout-hdr-btn" id="scout-clear-filters">Clear Filters</button>
     <button class="scout-hdr-btn" id="scout-close">✕ Close</button>
@@ -1032,7 +989,7 @@ function updateShortcutHint(){
   const h=document.getElementById('shortcut-hint');
   if(!h)return;
   const kl=id=>keyLabel(keys[id]);
-  h.innerHTML=`<span style="color:var(--accent2);margin-right:4px;">PLAYBACK</span><kbd>${kl('rev4x')}</kbd>4xrev <kbd>${kl('rev2x')}</kbd>2xrev <kbd>${kl('revHalf')}</kbd>½rev <kbd>${kl('play')}</kbd>play <kbd>${kl('fwdHalf')}</kbd>½fwd <kbd>${kl('fwd2x')}</kbd>2xfwd <kbd>${kl('skipBack')}</kbd><kbd>${kl('skipFwd')}</kbd>±5s &nbsp;<span style="color:var(--accent2);margin-right:4px;">DRAW</span><kbd>${kl('pen')}</kbd>pen <kbd>${kl('circle')}</kbd>circle <kbd>${kl('triangle')}</kbd>tri <kbd>${kl('clear')}</kbd>clear <kbd>${kl('undo')}</kbd>undo <kbd>${kl('fade')}</kbd>fade &nbsp;<span style="color:var(--accent2);margin-right:4px;">LOOP</span><kbd>${kl('clipIn')}</kbd>in <kbd>${kl('clipOut')}</kbd>out <kbd>${kl('clipLoop')}</kbd>loop <kbd>${kl('clipClear')}</kbd>clear &nbsp;<span style="color:var(--accent2);margin-right:4px;">REC</span><kbd>${kl('record')}</kbd>rec <kbd>${kl('webcam')}</kbd>cam`;
+  h.innerHTML=`<span style="color:var(--accent2);margin-right:4px;">PLAYBACK</span><kbd>${kl('rev4x')}</kbd>4xrev <kbd>${kl('rev2x')}</kbd>2xrev <kbd>${kl('revHalf')}</kbd>½rev <kbd>${kl('play')}</kbd>play <kbd>${kl('fwdHalf')}</kbd>½fwd <kbd>${kl('fwd2x')}</kbd>2xfwd <kbd>${kl('skipBack')}</kbd><kbd>${kl('skipFwd')}</kbd>±5s &nbsp;<span style="color:var(--accent2);margin-right:4px;">DRAW</span><kbd>${kl('pen')}</kbd>pen <kbd>${kl('circle')}</kbd>circle <kbd>${kl('triangle')}</kbd>tri <kbd>${kl('clear')}</kbd>clear <kbd>${kl('undo')}</kbd>undo <kbd>${kl('fade')}</kbd>fade &nbsp;<span style="color:var(--accent2);margin-right:4px;">LOOP</span><kbd>${kl('clipIn')}</kbd>in <kbd>${kl('clipOut')}</kbd>out <kbd>${kl('clipLoop')}</kbd>loop <kbd>${kl('clipClear')}</kbd>clear &nbsp;<span style="color:var(--accent2);margin-right:4px;">REC</span><kbd>${kl('record')}</kbd>rec <kbd>${kl('webcam')}</kbd>cam &nbsp;<span style="color:var(--accent2);margin-right:4px;">BOOKMARK</span><kbd>${kl('bookmark')}</kbd>mark`;
 }
 updateShortcutHint();
 
@@ -1497,7 +1454,7 @@ function showToast(msg){toast.textContent=msg;toast.classList.add('show');clearT
 renderPlaylist();renderBookmarks();
 
 // ── SCOUT TABLE ──
-const DEFAULT_COLS = ['Column 1','Column 2','Column 3','Column 4','Column 5'];
+const DEFAULT_COLS = ['Col 1','Col 2','Col 3','Col 4','Col 5','Col 6','Col 7','Notes'];
 let scoutCols = JSON.parse(localStorage.getItem('scout-cols')||JSON.stringify(DEFAULT_COLS));
 let colWidths = JSON.parse(localStorage.getItem('scout-col-widths')||'{}');
 let scoutFilters = {};
@@ -1538,135 +1495,158 @@ function renderScoutTable(){
   const tbody = document.getElementById('scout-tbody');
   thead.innerHTML=''; tbody.innerHTML='';
 
-  // Time column header
+  // Checkbox select-all header
+  const checkTh = document.createElement('th');
+  checkTh.style.cssText='width:28px;min-width:28px;text-align:center;padding:4px;';
+  const allChk = document.createElement('input');
+  allChk.type='checkbox'; allChk.title='Select all';
+  allChk.addEventListener('change', e => {
+    document.querySelectorAll('#scout-tbody .row-chk').forEach(c => {
+      c.checked = e.target.checked;
+      c.closest('tr').classList.toggle('selected-row', e.target.checked);
+    });
+    updateDeleteBtn();
+  });
+  checkTh.appendChild(allChk);
+  thead.appendChild(checkTh);
+
+  // Time column — narrow
   const timeTh = document.createElement('th');
-  timeTh.innerHTML='<div class="th-inner"><span class="th-name">Time</span></div>';
-  timeTh.style.width='60px';
+  timeTh.style.width='52px';
+  timeTh.innerHTML='<div class="th-inner"><span>Time</span></div>';
   thead.appendChild(timeTh);
 
-  // Data column headers
+  // Data columns
   scoutCols.forEach((col, ci) => {
     const th = document.createElement('th');
-    const colW = colWidths[ci] ? colWidths[ci]+'px' : '120px';
+    const colW = colWidths[ci] ? colWidths[ci]+'px' : (ci === scoutCols.length-1 ? '160px' : '80px');
     th.style.width = colW;
     const hasFilter = scoutFilters[ci] && scoutFilters[ci].size > 0;
     th.innerHTML=`<div class="th-inner">
-      <input class="th-edit" data-ci="${ci}" value="${col}" title="Click to rename"/>
-      <span class="filter-btn${hasFilter?' active':''}" data-ci="${ci}" title="Filter">▾</span>
-      <span class="col-del" data-ci="${ci}" title="Remove column">✕</span>
+      <input class="th-edit" data-ci="${ci}" value="${col}"/>
+      <span class="filter-btn${hasFilter?' active':''}" data-ci="${ci}">▾</span>
+      <span class="col-del" data-ci="${ci}">✕</span>
     </div><div class="col-resizer" data-ci="${ci}"></div>`;
     thead.appendChild(th);
   });
 
-  // Add column button
+  // Add column
   const addTh = document.createElement('th');
   addTh.className='add-col-th';
-  addTh.innerHTML='<button class="add-col-btn" title="Add column">+</button>';
+  addTh.innerHTML='<button class="add-col-btn">+</button>';
   addTh.querySelector('.add-col-btn').addEventListener('click', ()=>{
-    scoutCols.push('Column '+(scoutCols.length+1));
+    scoutCols.push('Col '+(scoutCols.length+1));
     saveCols(); renderScoutTable();
   });
   thead.appendChild(addTh);
 
-  // Column header events
+  // Header events
   thead.querySelectorAll('.th-edit').forEach(inp => {
-    inp.addEventListener('change', e => {
-      scoutCols[+e.target.dataset.ci] = e.target.value;
-      saveCols();
-    });
+    inp.addEventListener('change', e => { scoutCols[+e.target.dataset.ci]=e.target.value; saveCols(); });
   });
   thead.querySelectorAll('.col-resizer').forEach(resizer => {
     resizer.addEventListener('mousedown', e => {
-      e.stopPropagation();
-      e.preventDefault();
-      colResizing = true;
-      colResizeIdx = +resizer.dataset.ci;
-      colResizeStartX = e.clientX;
-      colResizeStartW = colWidths[colResizeIdx] || resizer.closest('th').offsetWidth;
-      document.body.style.cursor = 'col-resize';
+      e.stopPropagation(); e.preventDefault();
+      colResizing=true; colResizeIdx=+resizer.dataset.ci;
+      colResizeStartX=e.clientX;
+      colResizeStartW=colWidths[colResizeIdx]||resizer.closest('th').offsetWidth;
+      document.body.style.cursor='col-resize';
     });
-    // Double-click to auto-fit
     resizer.addEventListener('dblclick', e => {
       e.stopPropagation();
-      const ci = +resizer.dataset.ci;
-      // Find max content width in this column
-      let maxW = 60;
-      document.querySelectorAll(`#scout-tbody tr td:nth-child(${ci+2}) input`).forEach(inp => {
-        const w = inp.value.length * 8 + 24;
-        if(w > maxW) maxW = w;
+      const ci=+resizer.dataset.ci; let maxW=60;
+      document.querySelectorAll(`#scout-tbody tr td:nth-child(${ci+3}) input`).forEach(inp=>{
+        const w=inp.value.length*8+24; if(w>maxW) maxW=w;
       });
-      colWidths[ci] = maxW;
-      saveColWidths();
-      renderScoutTable();
+      colWidths[ci]=maxW; saveColWidths(); renderScoutTable();
     });
   });
+  thead.querySelectorAll('.col-del').forEach(btn => {
     btn.addEventListener('click', e => {
       e.stopPropagation();
-      const ci = +btn.dataset.ci;
-      scoutCols.splice(ci, 1);
-      delete scoutFilters[ci];
+      const ci=+btn.dataset.ci; scoutCols.splice(ci,1); delete scoutFilters[ci];
       saveCols(); renderScoutTable();
     });
   });
   thead.querySelectorAll('.filter-btn').forEach(btn => {
-    btn.addEventListener('click', e => {
-      e.stopPropagation();
-      openFilterDropdown(+btn.dataset.ci, btn);
-    });
+    btn.addEventListener('click', e => { e.stopPropagation(); openFilterDropdown(+btn.dataset.ci,btn); });
   });
 
-  // Rows — sorted by time
-  const sorted = [...state.bookmarks].sort((a,b)=>a.time-b.time);
+  // Rows sorted by time
+  const sorted=[...state.bookmarks].sort((a,b)=>a.time-b.time);
   sorted.forEach(bm => {
-    const bmId = bm.id || (bm.id = bm.time.toFixed(3));
-    const data = getScoutData(bmId);
-    const tr = document.createElement('tr');
+    const bmId=bm.id||(bm.id=bm.time.toFixed(3));
+    const data=getScoutData(bmId);
+    const tr=document.createElement('tr');
 
-    // Check if filtered out
-    let filteredOut = false;
-    Object.entries(scoutFilters).forEach(([ci, allowed]) => {
-      if(allowed.size > 0){
-        const val = (data[ci]||'').trim().toLowerCase();
-        const allowedLower = new Set([...allowed].map(v=>v.toLowerCase()));
-        if(!allowedLower.has(val)) filteredOut = true;
+    let filteredOut=false;
+    Object.entries(scoutFilters).forEach(([ci,allowed])=>{
+      if(allowed.size>0){
+        const val=(data[ci]||'').trim().toLowerCase();
+        if(![...allowed].map(v=>v.toLowerCase()).includes(val)) filteredOut=true;
       }
     });
     if(filteredOut) tr.classList.add('filtered-out');
 
-    // Time cell
-    const timeTd = document.createElement('td');
-    timeTd.className='time-cell';
-    timeTd.textContent = fmt(bm.time);
-    timeTd.title = 'Click to seek';
-    timeTd.addEventListener('click', ()=>{ video.currentTime=bm.time; });
+    // Checkbox
+    const chkTd=document.createElement('td');
+    chkTd.style.cssText='text-align:center;width:28px;padding:4px;';
+    const chk=document.createElement('input');
+    chk.type='checkbox'; chk.className='row-chk';
+    chk.addEventListener('change',()=>{ tr.classList.toggle('selected-row',chk.checked); updateDeleteBtn(); });
+    chkTd.appendChild(chk); tr.appendChild(chkTd);
+
+    // Time
+    const timeTd=document.createElement('td');
+    timeTd.className='time-cell'; timeTd.style.width='52px';
+    timeTd.textContent=fmt(bm.time); timeTd.title='Click to seek';
+    timeTd.addEventListener('click',()=>{ video.currentTime=bm.time; });
     tr.appendChild(timeTd);
 
     // Data cells
-    scoutCols.forEach((col, ci) => {
-      const td = document.createElement('td');
-      const inp = document.createElement('input');
-      inp.className='cell-input';
-      inp.value = data[ci]||'';
-      inp.placeholder = col;
-      inp.addEventListener('change', e => {
-        setScoutData(bmId, ci, e.target.value);
-        // Re-apply filters after edit
-        applyFilters();
-      });
-      td.appendChild(inp);
-      tr.appendChild(td);
+    scoutCols.forEach((col,ci)=>{
+      const td=document.createElement('td');
+      const inp=document.createElement('input');
+      inp.className='cell-input'; inp.value=data[ci]||''; inp.placeholder=col;
+      inp.addEventListener('change',e=>{ setScoutData(bmId,ci,e.target.value); applyFilters(); });
+      td.appendChild(inp); tr.appendChild(td);
     });
 
-    // Empty add-col cell
-    const emptyTd = document.createElement('td');
-    emptyTd.style.cssText='width:30px;border:1px solid var(--border);';
+    const emptyTd=document.createElement('td'); emptyTd.style.width='30px';
     tr.appendChild(emptyTd);
-
     tbody.appendChild(tr);
   });
+  updateDeleteBtn();
 }
 
-function applyFilters(){
+
+function updateDeleteBtn(){
+  const n = document.querySelectorAll('#scout-tbody .row-chk:checked').length;
+  let btn = document.getElementById('scout-delete-selected');
+  if(!btn) return;
+  btn.textContent = n > 0 ? `Delete ${n} Selected` : 'Delete Selected';
+  btn.disabled = n === 0;
+}
+
+function deleteSelectedRows(){
+  const rows = document.querySelectorAll('#scout-tbody tr');
+  const sorted = [...state.bookmarks].sort((a,b)=>a.time-b.time);
+  const toDelete = [];
+  rows.forEach((tr, i) => {
+    const chk = tr.querySelector('.row-chk');
+    if(chk && chk.checked && sorted[i]){
+      toDelete.push(sorted[i]);
+    }
+  });
+  toDelete.forEach(bm => {
+    const idx = state.bookmarks.indexOf(bm);
+    if(idx > -1) state.bookmarks.splice(idx, 1);
+    localStorage.removeItem('scout-'+(bm.id||bm.time.toFixed(3)));
+  });
+  renderBookmarks();
+  renderScoutTable();
+  showToast(toDelete.length + ' rows deleted');
+}
   const rows = document.querySelectorAll('#scout-tbody tr');
   const sorted = [...state.bookmarks].sort((a,b)=>a.time-b.time);
   rows.forEach((tr, i) => {
@@ -1736,6 +1716,7 @@ function closeFilterDropdown(){
 }
 
 // Export CSV
+document.getElementById('scout-delete-selected').addEventListener('click', deleteSelectedRows);
 document.getElementById('scout-export').addEventListener('click', ()=>{
   const sorted = [...state.bookmarks].sort((a,b)=>a.time-b.time);
   const header = ['Time', 'Bookmark Note', ...scoutCols];
