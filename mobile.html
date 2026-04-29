@@ -317,8 +317,16 @@ function toast(msg) {
   toastTimer=setTimeout(()=>t.classList.remove('show'),1800);
 }
 function resizeCanvas() {
-  canvas.width=canvas.offsetWidth;
-  canvas.height=canvas.offsetHeight;
+  // Match canvas exactly to the video element's rendered size and position
+  const r = video.getBoundingClientRect();
+  const p = document.getElementById('video-area').getBoundingClientRect();
+  canvas.style.position = 'absolute';
+  canvas.style.left = (r.left - p.left) + 'px';
+  canvas.style.top = (r.top - p.top) + 'px';
+  canvas.style.width = r.width + 'px';
+  canvas.style.height = r.height + 'px';
+  canvas.width = r.width;
+  canvas.height = r.height;
 }
 
 // File open
@@ -337,7 +345,10 @@ function loadFile(file){
 }
 
 // Video events
-video.addEventListener('loadedmetadata',()=>setTimeout(resizeCanvas,100));
+video.addEventListener('loadedmetadata', () => {
+  setTimeout(resizeCanvas, 200);
+  video.addEventListener('canplay', resizeCanvas, {once: true});
+});
 video.addEventListener('timeupdate',()=>{
   if(video.duration){
     progressFill.style.width=(video.currentTime/video.duration*100)+'%';
@@ -374,39 +385,61 @@ document.getElementById('btn-play').addEventListener('click',()=>{
 });
 
 // Speed buttons (hold to scrub)
-function makeSpeedBtn(id,speed){
-  const btn=document.getElementById(id);
-  btn.addEventListener('touchstart',e=>{
+function makeSpeedBtn(id, speed) {
+  const btn = document.getElementById(id);
+  let holdTimer = null;
+  let holding = false;
+
+  btn.addEventListener('touchstart', e => {
     e.preventDefault();
-    if(!video.src)return;
-    video.pause();
-    if(speed<0){
-      video.playbackRate=1;
-      speedInterval=setInterval(()=>{
-        video.currentTime=Math.max(0,video.currentTime-Math.abs(speed)*0.06);
-      },50);
+    if(!video.src) return;
+    holding = false;
+
+    // Short tap = single frame (1/30s)
+    holdTimer = setTimeout(() => {
+      holding = true;
+      // Hold mode — continuous scrub
+      video.pause();
+      if(speed < 0) {
+        speedInterval = setInterval(() => {
+          video.currentTime = Math.max(0, video.currentTime - Math.abs(speed) * 0.06);
+        }, 50);
+      } else {
+        video.playbackRate = speed;
+        video.play();
+      }
+    }, 180);
+  }, {passive: false});
+
+  btn.addEventListener('touchend', e => {
+    e.preventDefault();
+    clearTimeout(holdTimer);
+    if(!holding) {
+      // Tap — advance/rewind single frame (~1/30s)
+      const frameSize = 1 / 30;
+      video.currentTime = Math.max(0, Math.min(video.duration, video.currentTime + (speed < 0 ? -frameSize : frameSize)));
     } else {
-      video.playbackRate=speed;
-      video.play();
+      // Release from hold
+      clearInterval(speedInterval);
+      video.pause();
+      video.playbackRate = 1;
     }
-  },{passive:false});
-  btn.addEventListener('touchend',e=>{
+    holding = false;
+  }, {passive: false});
+
+  btn.addEventListener('touchcancel', e => {
     e.preventDefault();
+    clearTimeout(holdTimer);
     clearInterval(speedInterval);
     video.pause();
-    video.playbackRate=1;
-  },{passive:false});
-  btn.addEventListener('touchcancel',e=>{
-    e.preventDefault();
-    clearInterval(speedInterval);
-    video.pause();
-    video.playbackRate=1;
-  },{passive:false});
+    video.playbackRate = 1;
+    holding = false;
+  }, {passive: false});
 }
-makeSpeedBtn('btn-rev-fast',-2);
-makeSpeedBtn('btn-rev-slow',-0.5);
-makeSpeedBtn('btn-fwd-slow',0.5);
-makeSpeedBtn('btn-fwd-fast',2);
+makeSpeedBtn('btn-rev-fast', -2);
+makeSpeedBtn('btn-rev-slow', -0.5);
+makeSpeedBtn('btn-fwd-slow', 0.5);
+makeSpeedBtn('btn-fwd-fast', 2);
 
 // Draw mode
 document.getElementById('btn-draw').addEventListener('click',()=>{
