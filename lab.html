@@ -120,38 +120,38 @@
   @keyframes pulse-rec{0%,100%{opacity:1;}50%{opacity:.3;}}
 
   /* ── SCOUT TABLE ── */
-  #scout-panel{display:none;position:fixed;bottom:52px;left:0;right:0;height:260px;background:var(--surface);border-top:2px solid var(--gold);z-index:50;flex-direction:column;}
+  #scout-panel{display:none;height:240px;background:var(--surface);border-top:2px solid var(--gold);flex-direction:column;flex-shrink:0;min-height:80px;max-height:70vh;position:relative;}
   #scout-panel.visible{display:flex;}
+  #scout-resize-handle{position:absolute;top:-3px;left:0;right:0;height:8px;cursor:ns-resize;z-index:10;background:transparent;}
+  #scout-resize-handle:hover,#scout-resize-handle.dragging{background:rgba(232,184,75,0.25);}
   #scout-header{display:flex;align-items:center;gap:8px;padding:6px 12px;border-bottom:1px solid var(--border);flex-shrink:0;}
   #scout-header .scout-title{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);flex:1;}
   .scout-hdr-btn{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;background:var(--surface2);border:1px solid var(--border);color:var(--muted);padding:3px 8px;border-radius:3px;cursor:pointer;}
   .scout-hdr-btn:hover{color:var(--text);}
-  .scout-hdr-btn.gold{background:rgba(232,184,75,0.1);border-color:rgba(232,184,75,0.3);color:var(--gold);}
   #scout-table-wrap{flex:1;overflow:auto;}
   #scout-table-wrap::-webkit-scrollbar{width:4px;height:4px;}
   #scout-table-wrap::-webkit-scrollbar-thumb{background:var(--surface2);border-radius:2px;}
-  #scout-table{border-collapse:collapse;width:100%;min-width:600px;font-family:'Barlow Condensed',sans-serif;font-size:12px;}
-  #scout-table th{background:var(--surface2);border:1px solid var(--border);padding:5px 8px;text-align:left;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);white-space:nowrap;position:sticky;top:0;z-index:2;cursor:pointer;user-select:none;}
-  #scout-table th:hover{color:var(--text);}
+  #scout-table{border-collapse:collapse;table-layout:fixed;width:100%;font-family:'Barlow Condensed',sans-serif;font-size:12px;}
+  #scout-table th{background:var(--surface2);border:1px solid var(--border);padding:5px 8px;text-align:left;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);white-space:nowrap;position:sticky;top:0;z-index:2;overflow:hidden;user-select:none;position:relative;}
   #scout-table th .th-inner{display:flex;align-items:center;gap:4px;}
-  #scout-table th .th-name{flex:1;min-width:60px;}
-  #scout-table th input.th-edit{background:transparent;border:none;outline:none;color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;width:100%;min-width:60px;padding:0;}
-  #scout-table th .filter-btn{opacity:0.4;font-size:9px;cursor:pointer;padding:1px 3px;border-radius:2px;border:1px solid transparent;}
+  #scout-table th input.th-edit{background:transparent;border:none;outline:none;color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;width:100%;padding:0;cursor:pointer;min-width:20px;}
+  #scout-table th input.th-edit:focus{cursor:text;}
+  #scout-table th .filter-btn{opacity:0.4;font-size:9px;cursor:pointer;padding:1px 3px;border-radius:2px;border:1px solid transparent;flex-shrink:0;}
   #scout-table th .filter-btn:hover,.filter-btn.active{opacity:1;border-color:var(--gold);color:var(--gold);}
-  #scout-table th .col-del{opacity:0;font-size:10px;cursor:pointer;color:var(--red);}
+  #scout-table th .col-del{opacity:0;font-size:10px;cursor:pointer;color:var(--red);flex-shrink:0;}
   #scout-table th:hover .col-del{opacity:0.6;}
-  #scout-table td{border:1px solid var(--border);padding:0;}
-  #scout-table td.time-cell{padding:4px 8px;color:var(--gold);font-weight:600;white-space:nowrap;cursor:pointer;background:rgba(232,184,75,0.04);}
+  #scout-table th .col-resizer{position:absolute;right:0;top:0;bottom:0;width:5px;cursor:col-resize;background:transparent;z-index:3;}
+  #scout-table th .col-resizer:hover{background:rgba(232,184,75,0.5);}
+  #scout-table td{border:1px solid var(--border);padding:0;overflow:hidden;}
+  #scout-table td.time-cell{padding:4px 8px;color:var(--gold);font-weight:600;white-space:nowrap;cursor:pointer;background:rgba(232,184,75,0.04);width:60px;}
   #scout-table td.time-cell:hover{background:rgba(232,184,75,0.1);}
-  #scout-table td input.cell-input{background:transparent;border:none;outline:none;color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:12px;padding:4px 8px;width:100%;min-width:80px;}
+  #scout-table td input.cell-input{background:transparent;border:none;outline:none;color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:12px;padding:4px 8px;width:100%;}
   #scout-table td input.cell-input:focus{background:rgba(255,255,255,0.04);}
   #scout-table tr.filtered-out{display:none;}
   #scout-table tr:hover td{background:rgba(255,255,255,0.02);}
-  .add-col-th{background:var(--surface2)!important;text-align:center!important;width:30px;}
+  .add-col-th{background:var(--surface2)!important;text-align:center!important;width:30px;min-width:30px;}
   .add-col-btn{background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;padding:0 4px;line-height:1;}
   .add-col-btn:hover{color:var(--gold);}
-
-  /* Filter dropdown */
   .filter-dropdown{position:fixed;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:6px;z-index:300;min-width:140px;box-shadow:0 8px 24px rgba(0,0,0,0.5);}
   .filter-dropdown label{display:flex;align-items:center;gap:6px;padding:3px 6px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:12px;color:var(--text);border-radius:3px;}
   .filter-dropdown label:hover{background:rgba(255,255,255,0.05);}
@@ -236,6 +236,40 @@
   .tippy{position:fixed;background:#1e262f;border:1px solid rgba(255,255,255,0.12);color:#e8eaed;font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.04em;padding:5px 10px;border-radius:4px;pointer-events:none;z-index:9999;white-space:nowrap;opacity:0;transition:opacity .15s;box-shadow:0 4px 16px rgba(0,0,0,0.4);}
   .tippy.show{opacity:1;}
   .tippy kbd{background:rgba(232,184,75,0.15);border:1px solid rgba(232,184,75,0.3);border-radius:3px;padding:1px 5px;font-size:11px;color:#e8b84b;font-family:monospace;margin-left:5px;}
+  /* ── SCAN MODAL ── */
+  #scan-modal{display:none;position:fixed;inset:0;z-index:250;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);}
+  #scan-modal.open{display:flex;align-items:center;justify-content:center;}
+  #scan-box{background:#161c23;border:1px solid rgba(255,255,255,0.1);border-radius:12px;width:560px;max-width:95vw;max-height:80vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,0.7);}
+  #scan-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid rgba(255,255,255,0.07);font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);}
+  #scan-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:4px 8px;border-radius:4px;}
+  #scan-close:hover{color:var(--text);}
+  #scan-body{padding:16px 20px;flex:1;overflow-y:auto;}
+  #scan-progress-wrap{margin-bottom:16px;}
+  #scan-progress-bar-bg{height:6px;background:var(--surface2);border-radius:3px;overflow:hidden;}
+  #scan-progress-bar{height:100%;background:var(--gold);width:0%;transition:width 0.1s;border-radius:3px;}
+  #scan-status{font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-top:6px;}
+  #scan-results{display:none;}
+  #scan-results-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+  #scan-results-title{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);}
+  #scan-select-all{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;background:none;border:1px solid var(--border);color:var(--muted);padding:3px 8px;border-radius:3px;cursor:pointer;}
+  #scan-select-all:hover{color:var(--text);}
+  .scan-candidate{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:6px;cursor:pointer;border:1px solid transparent;margin-bottom:4px;transition:background 0.1s;}
+  .scan-candidate:hover{background:rgba(255,255,255,0.04);}
+  .scan-candidate.selected{background:rgba(232,184,75,0.08);border-color:rgba(232,184,75,0.2);}
+  .scan-candidate input[type=checkbox]{accent-color:var(--gold);width:14px;height:14px;flex-shrink:0;}
+  .scan-time{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:var(--gold);min-width:48px;}
+  .scan-conf{font-size:11px;color:var(--muted);flex:1;}
+  .scan-conf-bar{height:3px;border-radius:2px;background:var(--surface2);margin-top:3px;width:100%;}
+  .scan-conf-fill{height:100%;border-radius:2px;}
+  #scan-footer{padding:12px 20px;border-top:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:space-between;gap:8px;}
+  #scan-add-btn{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:var(--gold);color:#0a0c0f;border:none;border-radius:6px;padding:8px 20px;cursor:pointer;}
+  #scan-add-btn:disabled{opacity:0.4;cursor:default;}
+  #scan-add-btn:not(:disabled):hover{background:#f0c45a;}
+  #scan-count{font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--muted);}
+  #scan-sensitivity-wrap{display:flex;align-items:center;gap:8px;margin-bottom:14px;}
+  #scan-sensitivity-wrap label{font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;}
+  #scan-sensitivity{width:120px;accent-color:var(--gold);}
+  .scan-sens-val{font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--text);min-width:20px;}
 </style>
 <script>
   // Redirect mobile users immediately — no need to wait for Memberstack
@@ -838,10 +872,17 @@ scoutBtn.className='tb-btn';scoutBtn.id='btn-scout';scoutBtn.title='Scouting tab
 scoutBtn.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="9" x2="9" y2="21"/></svg> Scout`;
 settingsBtn.insertAdjacentElement('afterend',scoutBtn);
 
-// Scout panel HTML
+// Scan for Plays button
+const scanBtn=document.createElement('button');
+scanBtn.className='tb-btn';scanBtn.id='btn-scan';scanBtn.title='Auto-detect play breaks';
+scanBtn.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg> Scan`;
+scoutBtn.insertAdjacentElement('afterend',scanBtn);
+
+// Scout panel — insert inside #video-area before #controls so it pushes video up
 const scoutPanel=document.createElement('div');
 scoutPanel.id='scout-panel';
 scoutPanel.innerHTML=`
+  <div id="scout-resize-handle" title="Drag to resize"></div>
   <div id="scout-header">
     <span class="scout-title">⚑ Scouting Table</span>
     <button class="scout-hdr-btn" id="scout-export">Export CSV</button>
@@ -854,7 +895,32 @@ scoutPanel.innerHTML=`
       <tbody id="scout-tbody"></tbody>
     </table>
   </div>`;
-document.body.appendChild(scoutPanel);
+// Insert before controls bar inside video-area
+document.getElementById('controls').insertAdjacentElement('beforebegin', scoutPanel);
+
+// ── SCOUT PANEL RESIZE (drag top edge) ──
+const resizeHandle = document.getElementById('scout-resize-handle');
+let isResizing = false, resizeStartY = 0, resizeStartH = 0;
+resizeHandle.addEventListener('mousedown', e => {
+  isResizing = true;
+  resizeStartY = e.clientY;
+  resizeStartH = scoutPanel.offsetHeight;
+  resizeHandle.classList.add('dragging');
+  document.body.style.cursor = 'ns-resize';
+  e.preventDefault();
+});
+document.addEventListener('mousemove', e => {
+  if(!isResizing) return;
+  const delta = resizeStartY - e.clientY;
+  const newH = Math.max(80, Math.min(window.innerHeight * 0.7, resizeStartH + delta));
+  scoutPanel.style.height = newH + 'px';
+});
+document.addEventListener('mouseup', () => {
+  if(!isResizing) return;
+  isResizing = false;
+  resizeHandle.classList.remove('dragging');
+  document.body.style.cursor = '';
+});
 
 // Build settings panel HTML
 const settingsPanel=document.createElement('div');
@@ -1452,10 +1518,29 @@ renderPlaylist();renderBookmarks();
 // ── SCOUT TABLE ──
 const DEFAULT_COLS = ['Column 1','Column 2','Column 3','Column 4','Column 5'];
 let scoutCols = JSON.parse(localStorage.getItem('scout-cols')||JSON.stringify(DEFAULT_COLS));
-let scoutFilters = {}; // {colIndex: Set of allowed values}
+let colWidths = JSON.parse(localStorage.getItem('scout-col-widths')||'{}');
+let scoutFilters = {};
 let activeFilterDropdown = null;
 
 function saveCols(){ localStorage.setItem('scout-cols', JSON.stringify(scoutCols)); }
+function saveColWidths(){ localStorage.setItem('scout-col-widths', JSON.stringify(colWidths)); }
+
+// Column resize drag
+let colResizing = false, colResizeIdx = -1, colResizeStartX = 0, colResizeStartW = 0;
+document.addEventListener('mousemove', e => {
+  if(!colResizing) return;
+  const delta = e.clientX - colResizeStartX;
+  colWidths[colResizeIdx] = Math.max(60, colResizeStartW + delta);
+  // Update th width live
+  const ths = document.querySelectorAll('#scout-thead-row th');
+  if(ths[colResizeIdx+1]) ths[colResizeIdx+1].style.width = colWidths[colResizeIdx]+'px';
+});
+document.addEventListener('mouseup', () => {
+  if(!colResizing) return;
+  colResizing = false;
+  document.body.style.cursor = '';
+  saveColWidths();
+});
 
 // Save/load scout data per bookmark
 function getScoutData(bmId){
@@ -1481,12 +1566,14 @@ function renderScoutTable(){
   // Data column headers
   scoutCols.forEach((col, ci) => {
     const th = document.createElement('th');
+    const colW = colWidths[ci] ? colWidths[ci]+'px' : '120px';
+    th.style.width = colW;
     const hasFilter = scoutFilters[ci] && scoutFilters[ci].size > 0;
     th.innerHTML=`<div class="th-inner">
-      <input class="th-edit" data-ci="${ci}" value="${col}" title="Double-click to rename"/>
+      <input class="th-edit" data-ci="${ci}" value="${col}" title="Click to rename"/>
       <span class="filter-btn${hasFilter?' active':''}" data-ci="${ci}" title="Filter">▾</span>
       <span class="col-del" data-ci="${ci}" title="Remove column">✕</span>
-    </div>`;
+    </div><div class="col-resizer" data-ci="${ci}"></div>`;
     thead.appendChild(th);
   });
 
@@ -1507,7 +1594,31 @@ function renderScoutTable(){
       saveCols();
     });
   });
-  thead.querySelectorAll('.col-del').forEach(btn => {
+  thead.querySelectorAll('.col-resizer').forEach(resizer => {
+    resizer.addEventListener('mousedown', e => {
+      e.stopPropagation();
+      e.preventDefault();
+      colResizing = true;
+      colResizeIdx = +resizer.dataset.ci;
+      colResizeStartX = e.clientX;
+      colResizeStartW = colWidths[colResizeIdx] || resizer.closest('th').offsetWidth;
+      document.body.style.cursor = 'col-resize';
+    });
+    // Double-click to auto-fit
+    resizer.addEventListener('dblclick', e => {
+      e.stopPropagation();
+      const ci = +resizer.dataset.ci;
+      // Find max content width in this column
+      let maxW = 60;
+      document.querySelectorAll(`#scout-tbody tr td:nth-child(${ci+2}) input`).forEach(inp => {
+        const w = inp.value.length * 8 + 24;
+        if(w > maxW) maxW = w;
+      });
+      colWidths[ci] = maxW;
+      saveColWidths();
+      renderScoutTable();
+    });
+  });
     btn.addEventListener('click', e => {
       e.stopPropagation();
       const ci = +btn.dataset.ci;
@@ -1722,6 +1833,258 @@ function positionTip(e){
   if(y<8) y=e.clientY+20;
   tip.style.left=x+'px';tip.style.top=y+'px';
 }
+</script>
+<div id="scan-modal">
+  <div id="scan-box">
+    <div id="scan-header">
+      <span>⚡ Scan for Play Breaks</span>
+      <button id="scan-close">✕</button>
+    </div>
+    <div id="scan-body">
+      <div id="scan-sensitivity-wrap">
+        <label>Sensitivity</label>
+        <input type="range" id="scan-sensitivity" min="1" max="10" value="5" step="1">
+        <span class="scan-sens-val" id="scan-sens-val">5</span>
+        <span style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:var(--muted);">(higher = more breaks detected)</span>
+      </div>
+      <div id="scan-progress-wrap">
+        <div id="scan-progress-bar-bg"><div id="scan-progress-bar"></div></div>
+        <div id="scan-status">Ready to scan</div>
+      </div>
+      <div id="scan-results">
+        <div id="scan-results-header">
+          <span id="scan-results-title">Found 0 candidates</span>
+          <button id="scan-select-all">Select All</button>
+        </div>
+        <div id="scan-candidates-list"></div>
+      </div>
+    </div>
+    <div id="scan-footer">
+      <span id="scan-count">0 selected</span>
+      <div style="display:flex;gap:8px;">
+        <button class="scout-hdr-btn" id="scan-run-btn">▶ Start Scan</button>
+        <button id="scan-add-btn" disabled>Add Selected as Bookmarks</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── SCAN FOR PLAYS ──
+let scanCandidates = [];
+let scanRunning = false;
+
+// Open/close
+document.getElementById('btn-scan').addEventListener('click', () => {
+  if(!video.src || !video.duration){ showToast('Open a video first'); return; }
+  document.getElementById('scan-modal').classList.add('open');
+  document.getElementById('scan-results').style.display = 'none';
+  document.getElementById('scan-progress-bar').style.width = '0%';
+  document.getElementById('scan-status').textContent = 'Ready to scan';
+  scanCandidates = [];
+  updateScanCount();
+});
+document.getElementById('scan-close').addEventListener('click', () => {
+  if(scanRunning){ showToast('Scan in progress...'); return; }
+  document.getElementById('scan-modal').classList.remove('open');
+});
+document.getElementById('scan-sensitivity').addEventListener('input', e => {
+  document.getElementById('scan-sens-val').textContent = e.target.value;
+});
+
+// The core scan algorithm
+document.getElementById('scan-run-btn').addEventListener('click', async () => {
+  if(scanRunning) return;
+  if(!video.src || !video.duration){ showToast('Open a video first'); return; }
+
+  scanRunning = true;
+  scanCandidates = [];
+  document.getElementById('scan-results').style.display = 'none';
+  document.getElementById('scan-run-btn').textContent = '⏳ Scanning...';
+  document.getElementById('scan-add-btn').disabled = true;
+
+  const duration = video.duration;
+  const sensitivity = +document.getElementById('scan-sensitivity').value;
+
+  // Sample every 0.5s — capture frame, compare to previous
+  const sampleInterval = 0.5;
+  const totalSamples = Math.floor(duration / sampleInterval);
+  const offscreen = document.createElement('canvas');
+  offscreen.width = 64; offscreen.height = 36; // small for speed
+  const oc = offscreen.getContext('2d');
+
+  let prevPixels = null;
+  let motionScores = []; // [{time, score}]
+  const wasPlaying = !video.paused;
+  video.pause();
+  const origTime = video.currentTime;
+
+  document.getElementById('scan-status').textContent = 'Analyzing video frames...';
+
+  for(let i = 0; i < totalSamples; i++){
+    const t = i * sampleInterval;
+    video.currentTime = t;
+
+    // Wait for seek
+    await new Promise(res => {
+      const onSeeked = () => { video.removeEventListener('seeked', onSeeked); res(); };
+      video.addEventListener('seeked', onSeeked);
+    });
+
+    // Capture frame
+    oc.drawImage(video, 0, 0, 64, 36);
+    const pixels = oc.getImageData(0, 0, 64, 36).data;
+
+    if(prevPixels){
+      // Calculate mean absolute difference between frames
+      let diff = 0;
+      for(let p = 0; p < pixels.length; p += 4){
+        diff += Math.abs(pixels[p] - prevPixels[p]);
+        diff += Math.abs(pixels[p+1] - prevPixels[p+1]);
+        diff += Math.abs(pixels[p+2] - prevPixels[p+2]);
+      }
+      const score = diff / (64 * 36 * 3); // normalize 0-255
+      motionScores.push({ time: t, score });
+    }
+
+    prevPixels = new Uint8ClampedArray(pixels);
+
+    // Update progress
+    const pct = Math.round((i / totalSamples) * 100);
+    document.getElementById('scan-progress-bar').style.width = pct + '%';
+    document.getElementById('scan-status').textContent = `Analyzing... ${pct}%`;
+
+    // Yield to browser every 20 frames
+    if(i % 20 === 0) await new Promise(res => setTimeout(res, 0));
+  }
+
+  // Restore video state
+  video.currentTime = origTime;
+  if(wasPlaying) video.play();
+
+  // Find play breaks — look for LOW motion after HIGH motion
+  // (snap = high motion, huddle/lineup = low motion)
+  const threshold = 15 - (sensitivity * 1.2); // sensitivity 1-10 → threshold ~14 to ~3
+  const minGap = 3; // minimum seconds between detected plays
+
+  // Smooth motion scores with rolling average
+  const smoothed = motionScores.map((m, i) => {
+    const window = 3;
+    const start = Math.max(0, i - window);
+    const end = Math.min(motionScores.length - 1, i + window);
+    let sum = 0;
+    for(let j = start; j <= end; j++) sum += motionScores[j].score;
+    return { time: m.time, score: sum / (end - start + 1) };
+  });
+
+  // Find transitions: sustained low motion (play lined up) after motion (previous play)
+  let lastAdded = -minGap;
+  let inMotion = false;
+
+  smoothed.forEach((m, i) => {
+    const isMoving = m.score > threshold;
+    if(inMotion && !isMoving){
+      // Transition from motion → still = potential snap point coming up
+      // Look a bit ahead for when they actually snap (motion resumes)
+    }
+    if(!inMotion && isMoving && m.time - lastAdded >= minGap){
+      // Still → motion = snap! This is when the play starts
+      const confidence = Math.min(1, m.score / (threshold * 3));
+      scanCandidates.push({ time: m.time, score: m.score, confidence, selected: true });
+      lastAdded = m.time;
+    }
+    inMotion = isMoving;
+  });
+
+  // Show results
+  document.getElementById('scan-progress-bar').style.width = '100%';
+  document.getElementById('scan-status').textContent = `Scan complete — ${scanCandidates.length} candidates found`;
+  document.getElementById('scan-run-btn').textContent = '▶ Re-scan';
+  scanRunning = false;
+
+  renderScanResults();
+});
+
+function renderScanResults(){
+  const list = document.getElementById('scan-candidates-list');
+  list.innerHTML = '';
+  document.getElementById('scan-results').style.display = 'block';
+  document.getElementById('scan-results-title').textContent = `Found ${scanCandidates.length} candidates`;
+
+  if(!scanCandidates.length){
+    list.innerHTML = '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:12px;color:var(--muted);padding:12px;">No play breaks detected. Try increasing sensitivity.</div>';
+    return;
+  }
+
+  scanCandidates.forEach((c, i) => {
+    const div = document.createElement('div');
+    div.className = 'scan-candidate' + (c.selected ? ' selected' : '');
+    const confPct = Math.round(c.confidence * 100);
+    const confColor = c.confidence > 0.7 ? '#3ddc84' : c.confidence > 0.4 ? '#e8b84b' : '#e05252';
+    div.innerHTML = `
+      <input type="checkbox" ${c.selected ? 'checked' : ''}>
+      <span class="scan-time">${fmt(c.time)}</span>
+      <div class="scan-conf">
+        <span style="color:${confColor}">${confPct}% confidence</span>
+        <div class="scan-conf-bar"><div class="scan-conf-fill" style="width:${confPct}%;background:${confColor};"></div></div>
+      </div>
+      <button style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:11px;padding:2px 6px;font-family:'Barlow Condensed',sans-serif;" title="Preview">▶</button>`;
+
+    div.querySelector('input').addEventListener('change', e => {
+      scanCandidates[i].selected = e.target.checked;
+      div.classList.toggle('selected', e.target.checked);
+      updateScanCount();
+    });
+    div.querySelector('button').addEventListener('click', () => {
+      video.currentTime = c.time;
+      showToast('Jumped to ' + fmt(c.time));
+    });
+    div.addEventListener('click', e => {
+      if(e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON') return;
+      const chk = div.querySelector('input');
+      chk.checked = !chk.checked;
+      scanCandidates[i].selected = chk.checked;
+      div.classList.toggle('selected', chk.checked);
+      updateScanCount();
+    });
+    list.appendChild(div);
+  });
+
+  updateScanCount();
+}
+
+function updateScanCount(){
+  const n = scanCandidates.filter(c => c.selected).length;
+  document.getElementById('scan-count').textContent = n + ' selected';
+  document.getElementById('scan-add-btn').disabled = n === 0;
+}
+
+// Select all toggle
+let allSelected = true;
+document.getElementById('scan-select-all').addEventListener('click', () => {
+  allSelected = !allSelected;
+  scanCandidates.forEach(c => c.selected = allSelected);
+  document.getElementById('scan-select-all').textContent = allSelected ? 'Deselect All' : 'Select All';
+  renderScanResults();
+});
+
+// Add selected as bookmarks
+document.getElementById('scan-add-btn').addEventListener('click', () => {
+  const selected = scanCandidates.filter(c => c.selected);
+  let added = 0;
+  selected.forEach(c => {
+    // Don't duplicate existing bookmarks within 1s
+    const exists = state.bookmarks.some(b => Math.abs(b.time - c.time) < 1);
+    if(!exists){
+      state.bookmarks.push({ time: c.time, note: 'Play ' + fmt(c.time), id: c.time.toFixed(3) });
+      added++;
+    }
+  });
+  renderBookmarks();
+  if(scoutOpen) renderScoutTable();
+  document.getElementById('scan-modal').classList.remove('open');
+  showToast(added + ' bookmarks added');
+});
 </script>
 </body>
 </html>
