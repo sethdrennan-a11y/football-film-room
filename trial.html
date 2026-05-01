@@ -569,11 +569,21 @@ function getCropRect(){
 function renderDisplayFrame(){
   if(state.zoom<=1){zoomRAF=null;return;}
   const{sx,sy,sw,sh}=getCropRect();
-  displayCanvas.width=playerWrap.offsetWidth;
-  displayCanvas.height=playerWrap.offsetHeight;
-  dCtx.clearRect(0,0,displayCanvas.width,displayCanvas.height);
-  // Draw only the cropped video — drawings show through the canvas layer on top
-  dCtx.drawImage(video, sx,sy,sw,sh, 0,0,displayCanvas.width,displayCanvas.height);
+  const pw=playerWrap.offsetWidth, ph=playerWrap.offsetHeight;
+  displayCanvas.width=pw;
+  displayCanvas.height=ph;
+  dCtx.clearRect(0,0,pw,ph);
+  const cropAspect=sw/sh;
+  const wrapAspect=pw/ph;
+  let dw,dh,dx,dy;
+  if(cropAspect>wrapAspect){
+    dw=pw; dh=pw/cropAspect;
+    dx=0;  dy=(ph-dh)/2;
+  } else {
+    dh=ph; dw=ph*cropAspect;
+    dx=(pw-dw)/2; dy=0;
+  }
+  dCtx.drawImage(video, sx,sy,sw,sh, dx,dy,dw,dh);
   zoomRAF=requestAnimationFrame(renderDisplayFrame);
 }
 
@@ -760,7 +770,8 @@ function dispatchAction(action){
 const HOLD_ACTIONS=new Set(['rev4x','rev2x','revHalf','fwdHalf','fwd2x']);
 
 document.addEventListener('keydown',e=>{
-  if(e.target===bmNoteInput||settingsOpen)return;
+  const tag=e.target.tagName;
+  if(tag==='INPUT'||tag==='TEXTAREA'||e.target.isContentEditable||settingsOpen)return;
   const key=e.key.toLowerCase();
   const action=getAction(key,e.ctrlKey,e.altKey,e.shiftKey);
   if(!action)return;
