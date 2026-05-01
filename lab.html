@@ -280,14 +280,15 @@
 
 <div id="topbar">
   <div class="logo">&#9633; Film<span>Room</span></div>
-  <button class="tb-btn" id="btn-open-file"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>Open File</button>
-  <button class="tb-btn" id="btn-open-folder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>Load Folder</button>
-  <button class="tb-btn" id="btn-playlist-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>Playlist</button>
-  <button class="tb-btn" id="btn-bm-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>Bookmarks</button>
+  <button type="button" class="tb-btn" id="btn-open-file"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>Open File</button>
+  <button type="button" class="tb-btn" id="btn-open-folder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>Load Folder</button>
+  <button type="button" class="tb-btn" id="btn-playlist-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>Playlist</button>
+  <button type="button" class="tb-btn" id="btn-bm-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>Bookmarks</button>
   <input type="file" id="session-file-input" accept=".json" style="display:none">
-  <button class="tb-btn" id="btn-record"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><circle id="rec-dot" cx="12" cy="12" r="4" fill="currentColor"/></svg>Record</button>
+  <button type="button" class="tb-btn" id="btn-record"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><circle id="rec-dot" cx="12" cy="12" r="4" fill="currentColor"/></svg>Record</button>
 
   <div class="spacer"></div>
+  <div id="filename-display">No file loaded</div>
   <a href="/account.html" class="tb-btn" style="text-decoration:none;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>Account</a>
 </div>
 
@@ -429,14 +430,17 @@ function loadFile(file){
 }
 function loadClip(idx){if(idx<0||idx>=state.playlist.length)return;state.currentClip=idx;loadFile(state.playlist[idx]);renderPlaylist();}
 
-document.getElementById('file-single').addEventListener('change',e=>{if(e.target.files[0])loadFile(e.target.files[0]);});
+document.getElementById('file-single').addEventListener('change',e=>{
+  if(e.target.files[0]){loadFile(e.target.files[0]); e.target.value='';}
+});
 document.getElementById('file-folder').addEventListener('change',e=>{
   const files=Array.from(e.target.files).filter(f=>f.type.startsWith('video/')).sort((a,b)=>a.name.localeCompare(b.name));
   if(!files.length)return;state.playlist=files;renderPlaylist();playlistPanel.classList.remove('hidden');loadClip(0);showToast(files.length+' clips loaded');
 });
-document.getElementById('btn-open-file').addEventListener('click',()=>document.getElementById('file-single').click());
-document.getElementById('btn-open-folder').addEventListener('click',()=>document.getElementById('file-folder').click());
-document.getElementById('dz-open-file').addEventListener('click',()=>document.getElementById('file-single').click());
+const fileSingle = document.getElementById('file-single');
+document.getElementById('btn-open-file').addEventListener('click', e => { e.preventDefault(); fileSingle.click(); });
+document.getElementById('btn-open-folder').addEventListener('click', ()=>document.getElementById('file-folder').click());
+document.getElementById('dz-open-file').addEventListener('click', e => { e.preventDefault(); fileSingle.click(); });
 document.getElementById('dz-open-folder').addEventListener('click',()=>document.getElementById('file-folder').click());
 document.addEventListener('dragover',e=>{e.preventDefault();dropZone.classList.remove('hidden');dropZone.classList.add('drag-over');});
 document.addEventListener('dragleave',e=>{if(!e.relatedTarget){dropZone.classList.remove('drag-over');if(video.src)dropZone.classList.add('hidden');}});
@@ -1460,18 +1464,35 @@ let colWidths = JSON.parse(localStorage.getItem('scout-col-widths')||'{}');
 let scoutFilters = {};
 let activeFilterDropdown = null;
 
+// Single source of truth — all scout row data lives here
+// Structure: { [bmId]: { [colIndex]: 'value' } }
+let scoutData = {};
+try { scoutData = JSON.parse(localStorage.getItem('scout-data')||'{}'); } catch { scoutData = {}; }
+
+function saveScoutData(){ 
+  try { localStorage.setItem('scout-data', JSON.stringify(scoutData)); } catch(e) { console.warn('Scout save failed', e); }
+}
 function saveCols(){ localStorage.setItem('scout-cols', JSON.stringify(scoutCols)); }
 function saveColWidths(){ localStorage.setItem('scout-col-widths', JSON.stringify(colWidths)); }
+
+function getCell(bmId, ci){ return (scoutData[bmId]||{})[ci]||''; }
+function setCell(bmId, ci, val){ 
+  // Sanitize — strip any HTML, limit to 200 chars
+  const clean = String(val).replace(/<[^>]*>/g,'').substring(0,200);
+  if(!scoutData[bmId]) scoutData[bmId] = {};
+  scoutData[bmId][ci] = clean;
+  saveScoutData();
+}
+function deleteRowData(bmId){ delete scoutData[bmId]; saveScoutData(); }
 
 // Column resize drag
 let colResizing = false, colResizeIdx = -1, colResizeStartX = 0, colResizeStartW = 0;
 document.addEventListener('mousemove', e => {
   if(!colResizing) return;
   const delta = e.clientX - colResizeStartX;
-  colWidths[colResizeIdx] = Math.max(60, colResizeStartW + delta);
-  // Update th width live
+  colWidths[colResizeIdx] = Math.max(50, colResizeStartW + delta);
   const ths = document.querySelectorAll('#scout-thead-row th');
-  if(ths[colResizeIdx+1]) ths[colResizeIdx+1].style.width = colWidths[colResizeIdx]+'px';
+  if(ths[colResizeIdx+2]) ths[colResizeIdx+2].style.width = colWidths[colResizeIdx]+'px';
 });
 document.addEventListener('mouseup', () => {
   if(!colResizing) return;
@@ -1479,16 +1500,6 @@ document.addEventListener('mouseup', () => {
   document.body.style.cursor = '';
   saveColWidths();
 });
-
-// Save/load scout data per bookmark
-function getScoutData(bmId){
-  try { return JSON.parse(localStorage.getItem('scout-'+bmId)||'{}'); } catch { return {}; }
-}
-function setScoutData(bmId, colIdx, val){
-  const d = getScoutData(bmId);
-  d[colIdx] = val;
-  localStorage.setItem('scout-'+bmId, JSON.stringify(d));
-}
 
 function renderScoutTable(){
   const thead = document.getElementById('scout-thead-row');
@@ -1576,13 +1587,12 @@ function renderScoutTable(){
   const sorted=[...state.bookmarks].sort((a,b)=>a.time-b.time);
   sorted.forEach(bm => {
     const bmId=bm.id||(bm.id=bm.time.toFixed(3));
-    const data=getScoutData(bmId);
     const tr=document.createElement('tr');
 
     let filteredOut=false;
     Object.entries(scoutFilters).forEach(([ci,allowed])=>{
       if(allowed.size>0){
-        const val=(data[ci]||'').trim().toLowerCase();
+        const val=getCell(bmId,+ci).trim().toLowerCase();
         if(![...allowed].map(v=>v.toLowerCase()).includes(val)) filteredOut=true;
       }
     });
@@ -1607,8 +1617,11 @@ function renderScoutTable(){
     scoutCols.forEach((col,ci)=>{
       const td=document.createElement('td');
       const inp=document.createElement('input');
-      inp.className='cell-input'; inp.value=data[ci]||''; inp.placeholder=col;
-      inp.addEventListener('change',e=>{ setScoutData(bmId,ci,e.target.value); applyFilters(); });
+      inp.className='cell-input'; 
+      inp.value=getCell(bmId,ci); 
+      inp.placeholder=col;
+      inp.addEventListener('change',e=>{ setCell(bmId,ci,e.target.value); applyFilters(); });
+      inp.addEventListener('blur',e=>{ setCell(bmId,ci,e.target.value); });
       td.appendChild(inp); tr.appendChild(td);
     });
 
@@ -1628,50 +1641,47 @@ function updateDeleteBtn(){
   btn.disabled = n === 0;
 }
 
-function deleteSelectedRows(){
-  const rows = document.querySelectorAll('#scout-tbody tr');
-  const sorted = [...state.bookmarks].sort((a,b)=>a.time-b.time);
-  const toDelete = [];
-  rows.forEach((tr, i) => {
-    const chk = tr.querySelector('.row-chk');
-    if(chk && chk.checked && sorted[i]){
-      toDelete.push(sorted[i]);
-    }
-  });
-  toDelete.forEach(bm => {
-    const idx = state.bookmarks.indexOf(bm);
-    if(idx > -1) state.bookmarks.splice(idx, 1);
-    localStorage.removeItem('scout-'+(bm.id||bm.time.toFixed(3)));
-  });
-  renderBookmarks();
-  renderScoutTable();
-  showToast(toDelete.length + ' rows deleted');
-}
+function applyFilters(){
   const rows = document.querySelectorAll('#scout-tbody tr');
   const sorted = [...state.bookmarks].sort((a,b)=>a.time-b.time);
   rows.forEach((tr, i) => {
     const bm = sorted[i];
     if(!bm) return;
     const bmId = bm.id || bm.time.toFixed(3);
-    const data = getScoutData(bmId);
     let filteredOut = false;
     Object.entries(scoutFilters).forEach(([ci, allowed]) => {
       if(allowed.size > 0){
-        const val = (data[ci]||'').trim().toLowerCase();
-        const allowedLower = new Set([...allowed].map(v=>v.toLowerCase()));
-        if(!allowedLower.has(val)) filteredOut = true;
+        const val = getCell(bmId, +ci).trim().toLowerCase();
+        if(![...allowed].map(v=>v.toLowerCase()).includes(val)) filteredOut = true;
       }
     });
     tr.classList.toggle('filtered-out', filteredOut);
   });
 }
 
+function deleteSelectedRows(){
+  const rows = document.querySelectorAll('#scout-tbody tr');
+  const sorted = [...state.bookmarks].sort((a,b)=>a.time-b.time);
+  const toDelete = [];
+  rows.forEach((tr, i) => {
+    const chk = tr.querySelector('.row-chk');
+    if(chk && chk.checked && sorted[i]) toDelete.push(sorted[i]);
+  });
+  toDelete.forEach(bm => {
+    const idx = state.bookmarks.indexOf(bm);
+    if(idx > -1) state.bookmarks.splice(idx, 1);
+    deleteRowData(bm.id||bm.time.toFixed(3));
+  });
+  renderBookmarks();
+  renderScoutTable();
+  showToast(toDelete.length + ' rows deleted');
+}
+
 function getColValues(ci){
   const vals = new Set();
   state.bookmarks.forEach(bm => {
     const bmId = bm.id || bm.time.toFixed(3);
-    const d = getScoutData(bmId);
-    const v = (d[ci]||'').trim();
+    const v = getCell(bmId, ci).trim();
     if(v) vals.add(v);
   });
   return vals;
@@ -1722,8 +1732,7 @@ document.getElementById('scout-export').addEventListener('click', ()=>{
   const header = ['Time', 'Bookmark Note', ...scoutCols];
   const rows = sorted.map(bm => {
     const bmId = bm.id||bm.time.toFixed(3);
-    const data = getScoutData(bmId);
-    const cols = scoutCols.map((_,ci)=>'"'+(data[ci]||'').replace(/"/g,'""')+'"');
+    const cols = scoutCols.map((_,ci)=>'"'+getCell(bmId,ci).replace(/"/g,'""')+'"');
     return [fmt(bm.time), '"'+(bm.note||'').replace(/"/g,'""')+'"', ...cols].join(',');
   });
   const csv = [header.join(','), ...rows].join('\n');
@@ -1872,11 +1881,12 @@ document.getElementById('scan-run-btn').addEventListener('click', async () => {
   const sampleInterval = 0.5;
   const totalSamples = Math.floor(duration / sampleInterval);
   const offscreen = document.createElement('canvas');
-  offscreen.width = 64; offscreen.height = 36; // small for speed
+  // Use 64x36 downsampled canvas — Gemini's recommendation
+  offscreen.width = 64; offscreen.height = 36;
   const oc = offscreen.getContext('2d');
 
   let prevPixels = null;
-  let motionScores = []; // [{time, score}]
+  let motionScores = [];
   const wasPlaying = !video.paused;
   video.pause();
   const origTime = video.currentTime;
@@ -1887,25 +1897,25 @@ document.getElementById('scan-run-btn').addEventListener('click', async () => {
     const t = i * sampleInterval;
     video.currentTime = t;
 
-    // Wait for seek
     await new Promise(res => {
       const onSeeked = () => { video.removeEventListener('seeked', onSeeked); res(); };
       video.addEventListener('seeked', onSeeked);
     });
 
-    // Capture frame
-    oc.drawImage(video, 0, 0, 64, 36);
+    // Draw only the CENTER 50% of the frame — ignore crowd/sidelines
+    const vw = video.videoWidth||640, vh = video.videoHeight||360;
+    const cx = vw*0.25, cy = vh*0.2, cw = vw*0.5, ch = vh*0.6;
+    oc.drawImage(video, cx,cy,cw,ch, 0,0,64,36);
     const pixels = oc.getImageData(0, 0, 64, 36).data;
 
     if(prevPixels){
-      // Calculate mean absolute difference between frames
       let diff = 0;
       for(let p = 0; p < pixels.length; p += 4){
         diff += Math.abs(pixels[p] - prevPixels[p]);
         diff += Math.abs(pixels[p+1] - prevPixels[p+1]);
         diff += Math.abs(pixels[p+2] - prevPixels[p+2]);
       }
-      const score = diff / (64 * 36 * 3); // normalize 0-255
+      const score = diff / (64 * 36 * 3);
       motionScores.push({ time: t, score });
     }
 
@@ -2035,10 +2045,10 @@ document.getElementById('scan-add-btn').addEventListener('click', () => {
   const selected = scanCandidates.filter(c => c.selected);
   let added = 0;
   selected.forEach(c => {
-    // Don't duplicate existing bookmarks within 1s
     const exists = state.bookmarks.some(b => Math.abs(b.time - c.time) < 1);
     if(!exists){
-      state.bookmarks.push({ time: c.time, note: 'Play ' + fmt(c.time), id: c.time.toFixed(3) });
+      const bmId = c.time.toFixed(3);
+      state.bookmarks.push({ time: c.time, note: 'Play '+fmt(c.time), id: bmId });
       added++;
     }
   });
