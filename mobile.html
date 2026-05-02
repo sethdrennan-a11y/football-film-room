@@ -514,15 +514,23 @@ document.getElementById('btn-record').addEventListener('click',async()=>{
       const tracks=[...stream.getTracks()];
       if(micStream)micStream.getAudioTracks().forEach(t=>tracks.push(t));
       const combined=new MediaStream(tracks);
-      mediaRecorder=new MediaRecorder(combined,{mimeType:'video/webm'});
+      // Pick best supported format — MP4 for iOS, WebM for others
+      const mimeType = MediaRecorder.isTypeSupported('video/mp4;codecs=avc1')
+        ? 'video/mp4;codecs=avc1'
+        : MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
+        ? 'video/webm;codecs=vp9'
+        : 'video/webm';
+      const ext = mimeType.startsWith('video/mp4') ? 'mp4' : 'webm';
+
+      mediaRecorder=new MediaRecorder(combined,{mimeType});
       recordChunks=[];
       mediaRecorder.ondataavailable=e=>{if(e.data.size>0)recordChunks.push(e.data);};
       mediaRecorder.onstop=()=>{
-        const blob=new Blob(recordChunks,{type:'video/webm'});
+        const blob=new Blob(recordChunks,{type:mimeType});
         const a=document.createElement('a');
-        a.href=URL.createObjectURL(blob); a.download='filmroom.webm'; a.click();
+        a.href=URL.createObjectURL(blob); a.download=`filmroom.${ext}`; a.click();
         if(micStream)micStream.getTracks().forEach(t=>t.stop());
-        toast('Saved!');
+        toast('Saved! Open in Files app to share.');
       };
       mediaRecorder.start(100);
       recordingActive=true;
