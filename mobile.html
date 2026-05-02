@@ -525,12 +525,31 @@ document.getElementById('btn-record').addEventListener('click',async()=>{
       mediaRecorder=new MediaRecorder(combined,{mimeType});
       recordChunks=[];
       mediaRecorder.ondataavailable=e=>{if(e.data.size>0)recordChunks.push(e.data);};
-      mediaRecorder.onstop=()=>{
+      mediaRecorder.onstop=async()=>{
         const blob=new Blob(recordChunks,{type:mimeType});
-        const a=document.createElement('a');
-        a.href=URL.createObjectURL(blob); a.download=`filmroom.${ext}`; a.click();
+        const filename=`filmroom.${ext}`;
         if(micStream)micStream.getTracks().forEach(t=>t.stop());
-        toast('Saved! Open in Files app to share.');
+
+        // Try native share sheet — on iPhone this allows "Save to Camera Roll"
+        if(navigator.share && navigator.canShare){
+          const file=new File([blob],filename,{type:mimeType});
+          if(navigator.canShare({files:[file]})){
+            try{
+              await navigator.share({files:[file],title:'Film Room Recording'});
+              toast('Shared!');
+              return;
+            } catch(e){
+              if(e.name==='AbortError') return; // user cancelled
+            }
+          }
+        }
+
+        // Fallback — standard download to Files app
+        const a=document.createElement('a');
+        a.href=URL.createObjectURL(blob);
+        a.download=filename;
+        a.click();
+        toast('Saved to Files app');
       };
       mediaRecorder.start(100);
       recordingActive=true;
