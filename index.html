@@ -827,9 +827,13 @@
 
   function redirectMember(member) {
     if (!member) return;
-    const plans = member.planConnections||[];
     const isPaid = (member.planConnections||[]).some(p => p.status === 'ACTIVE');
-    window.location.href = isPaid ? '/app.html' : '/trial.html';
+    const isMobile = /iPhone|iPad|Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    if (isPaid) {
+      window.location.href = isMobile ? '/mobile.html' : '/app.html';
+    } else {
+      window.location.href = '/trial.html';
+    }
   }
 
   function openSignup() {
